@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CF1ED1D7-A208-4825-A3F5-0D7C15257E6C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{30743915-331F-432E-92A4-C40484F0B9A1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{7B9194E1-E84C-4D0E-8F93-D71770F408C6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KinoDev.ApiGateway.WebApi", "src\KinoDev.ApiGateway.WebApi\KinoDev.ApiGateway.WebApi.csproj", "{F691C5A2-D32A-41C2-9201-499B122BC54E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KinoDev.ApiGateway.UnitTests", "tests\KinoDev.ApiGateway.UnitTests\KinoDev.ApiGateway.UnitTests.csproj", "{371B1F78-8306-4B76-809C-E02B156EF2BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F691C5A2-D32A-41C2-9201-499B122BC54E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F691C5A2-D32A-41C2-9201-499B122BC54E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F691C5A2-D32A-41C2-9201-499B122BC54E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F691C5A2-D32A-41C2-9201-499B122BC54E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{371B1F78-8306-4B76-809C-E02B156EF2BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{371B1F78-8306-4B76-809C-E02B156EF2BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{371B1F78-8306-4B76-809C-E02B156EF2BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{371B1F78-8306-4B76-809C-E02B156EF2BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F691C5A2-D32A-41C2-9201-499B122BC54E} = {CF1ED1D7-A208-4825-A3F5-0D7C15257E6C}
+		{371B1F78-8306-4B76-809C-E02B156EF2BA} = {30743915-331F-432E-92A4-C40484F0B9A1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {65A84420-31AB-4BA8-8AF7-D8CAA6D343B2}
+	EndGlobalSection
+EndGlobal
