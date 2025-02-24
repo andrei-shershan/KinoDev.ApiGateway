@@ -1,3 +1,5 @@
+using KinoDev.ApiGateway.WebApi.ConfigurationSettings;
+using KinoDev.ApiGateway.WebApi.SetupExtensions;
 
 namespace KinoDev.ApiGateway.WebApi
 {
@@ -25,6 +27,9 @@ namespace KinoDev.ApiGateway.WebApi
                     // .AllowCredentials();
                 });
             });
+
+            var jwtSettings = builder.Configuration.GetSection("JWT").Get<JwtSettings>();
+            builder.Services.SetupAuthentication(jwtSettings);
 
             var app = builder.Build();
 

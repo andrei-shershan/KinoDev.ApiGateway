@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 
 namespace KinoDev.ApiGateway.WebApi.Controllers
 {
@@ -6,16 +9,25 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
+        [Authorize]
         [HttpGet("hello")]
         public async Task<IActionResult> GetHello()
         {
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+
             // TODO: Allow it in local dev only
             var handler = new HttpClientHandler
             {
-                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
             };
 
+            // TODO: Implement refresh-tokens
+            // TODO: Move to service
+            // TODO: Add DI for httClients
             var httpClient = new HttpClient(handler);
+            httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", accessToken);
+
             var response = httpClient.GetAsync("https://domain-service.kinodev.localhost/api/test/hello").Result;
 
             if (response.IsSuccessStatusCode)
@@ -25,6 +37,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             }
             else
             {
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error calling domain service from API gateway");
             }
         }
