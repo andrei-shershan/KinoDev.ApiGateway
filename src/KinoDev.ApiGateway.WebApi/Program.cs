@@ -1,5 +1,9 @@
-using KinoDev.ApiGateway.WebApi.ConfigurationSettings;
 using KinoDev.ApiGateway.WebApi.SetupExtensions;
+using Microsoft.IdentityModel.Protocols.Configuration;
+using KinoDev.ApiGateway.Infrastructure.Extensions;
+using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
+using Microsoft.Extensions.Options;
 
 namespace KinoDev.ApiGateway.WebApi
 {
@@ -28,8 +32,35 @@ namespace KinoDev.ApiGateway.WebApi
                 });
             });
 
-            var jwtSettings = builder.Configuration.GetSection("JWT").Get<JwtSettings>();
-            builder.Services.SetupAuthentication(jwtSettings);
+            var authenticationSettings = builder.Configuration.GetSection("AuthenticationSettings").Get<AuthenticationSettings>();
+            var apiClients = builder.Configuration.GetSection("ApiClients").Get<ApiClients>();
+            if (authenticationSettings == null || apiClients == null)
+            {
+                throw new InvalidConfigurationException("Cannot obtain AuthenticationSettings from settings!");
+            }
+
+            builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSection("AuthenticationSettings"));
+
+            builder.Services.SetupAuthentication(authenticationSettings);
+
+            builder.Services.InitializeInfrastructure();
+
+            builder.Services.AddTransient<InternalAuthenticationDelegationHandler>();
+
+            builder.Services
+                .AddHttpClient<IAuthenticationClient, AuthenticationClient>(options =>
+                {
+                    options.BaseAddress = new Uri(apiClients.IdentityServiceUri);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(true));
+
+            builder.Services
+                .AddHttpClient<IDomainServiceClient, DomainServiceClient>(options =>
+                {
+                    options.BaseAddress = new Uri(apiClients.DomainServiceUri);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(true))
+                .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
 
             var app = builder.Build();
 
@@ -44,9 +75,8 @@ namespace KinoDev.ApiGateway.WebApi
             app.UseRouting();
 
             app.UseCors(); // Ensure CORS middleware is used
-            
-            app.UseAuthorization();
 
+            app.UseAuthorization();
 
             app.MapControllers();
 
