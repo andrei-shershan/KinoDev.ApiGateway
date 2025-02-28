@@ -1,4 +1,4 @@
-﻿using KinoDev.ApiGateway.WebApi.ConfigurationSettings;
+﻿using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -9,32 +9,26 @@ namespace KinoDev.ApiGateway.WebApi.SetupExtensions
     {
         public static IServiceCollection SetupAuthentication(
             this IServiceCollection services,
-            JwtSettings jwtSettings
+            AuthenticationSettings authenticationSettings
             )
         {
             services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+                .AddAuthentication(options =>
                 {
-                    // TODO: To settigns / variables
-                    options.Authority = jwtSettings.Authority;
-                    options.Audience = jwtSettings.Audience;
-                    options.TokenValidationParameters = new TokenValidationParameters()
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options => {
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidAudience = jwtSettings.Audience,
-                        ValidIssuer = jwtSettings.Issuer,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
-                    };
-
-                    // TODO: remove this when everything is OK
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnAuthenticationFailed = context =>
-                        {
-                            // Log the error message to see what exactly is failing
-                            Console.WriteLine("Authentication failed in GATEWAY: " + context.Exception.Message + context.Exception.StackTrace);
-                            return Task.CompletedTask;
-                        }
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = authenticationSettings.Issuer,
+                        ValidAudience = authenticationSettings.Audiences.Gateway,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.Secret)),
+                        ClockSkew = TimeSpan.Zero
                     };
                 });
 
