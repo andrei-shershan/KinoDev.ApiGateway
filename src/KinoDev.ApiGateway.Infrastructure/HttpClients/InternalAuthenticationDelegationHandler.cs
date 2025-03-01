@@ -24,9 +24,6 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             _token = GetNotExpiredTokenFromCache();
             if (_token == null)
             {
-                Console.WriteLine("********************");
-                Console.WriteLine("NO TOKEN IN CACHE");
-
                 var tokenResponse = await _authenticationClient.GetClientTokenAsync();
                 _token = new TokenModel
                 {
@@ -34,19 +31,11 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
                     ExpiredAt = tokenResponse.ExpiredAt
                 };
 
-                Console.WriteLine("Expiredat " + tokenResponse.ExpiredAt);
-                Console.WriteLine("Now " + DateTime.UtcNow);
-
                 _cacheProvider.Set<TokenModel>(
                     CacheConstants.TokenKey,
                     tokenResponse,
                     (tokenResponse.ExpiredAt - DateTime.UtcNow - TimeSpan.FromMinutes(1))
                     );
-            }
-            else
-            {
-                Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-                Console.WriteLine("Token from cache");
             }
 
             // Add the token to the request headers

@@ -32,14 +32,15 @@ namespace KinoDev.ApiGateway.WebApi
                 });
             });
 
-            var authenticationSettings = builder.Configuration.GetSection("AuthenticationSettings").Get<AuthenticationSettings>();
-            var apiClients = builder.Configuration.GetSection("ApiClients").Get<ApiClients>();
-            if (authenticationSettings == null || apiClients == null)
+            var authenticationSettings = builder.Configuration.GetSection("Authentication").Get<AuthenticationSettings>();
+            var apiClients = builder.Configuration.GetSection("ApiClients").Get<ApiClientsSettings>();
+            var appBuilderSettigns = builder.Configuration.GetSection("AppBuilder").Get<AppBuilderSettigns>();
+            if (authenticationSettings == null || apiClients == null || appBuilderSettigns == null)
             {
                 throw new InvalidConfigurationException("Cannot obtain AuthenticationSettings from settings!");
             }
 
-            builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSection("AuthenticationSettings"));
+            builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSection("Authentication"));
 
             builder.Services.SetupAuthentication(authenticationSettings);
 
@@ -52,14 +53,14 @@ namespace KinoDev.ApiGateway.WebApi
                 {
                     options.BaseAddress = new Uri(apiClients.IdentityServiceUri);
                 })
-                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(true));
+                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors));
 
             builder.Services
                 .AddHttpClient<IDomainServiceClient, DomainServiceClient>(options =>
                 {
                     options.BaseAddress = new Uri(apiClients.DomainServiceUri);
                 })
-                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(true))
+                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors))
                 .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
 
             var app = builder.Build();
