@@ -1,8 +1,13 @@
-﻿namespace KinoDev.ApiGateway.Infrastructure.HttpClients
+﻿using KinoDev.ApiGateway.Infrastructure.Constants;
+using KinoDev.ApiGateway.Infrastructure.Extensions;
+using KinoDev.Shared.DtoModels;
+
+namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 {
     public interface IDomainServiceClient
     {
-        public Task<string> TestCall();
+        Task<IEnumerable<MovieDto>> GetMoviesAsync();
+        Task<string> TestCall();
     }
 
     public class DomainServiceClient : IDomainServiceClient
@@ -12,6 +17,13 @@
         public DomainServiceClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public async Task<IEnumerable<MovieDto>> GetMoviesAsync()
+        {
+            var response = await _httpClient.GetAsync(DomainApiEndpoints.Movies.GetMovies);
+
+            return await response.GetResponseAsync<IEnumerable<MovieDto>>();
         }
 
         public async Task<string> TestCall()
