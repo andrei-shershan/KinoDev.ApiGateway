@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace KinoDev.ApiGateway.Infrastructure.Extensions
 {
-    public static class InfrastructireExtension
+    public static class InfrastructureExtension
     {
         public static IServiceCollection InitializeInfrastructure(this IServiceCollection services)
         {
