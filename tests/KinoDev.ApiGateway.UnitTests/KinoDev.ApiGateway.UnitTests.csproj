@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\KinoDev.ApiGateway.Infrastructure\KinoDev.ApiGateway.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\KinoDev.ApiGateway.WebApi\KinoDev.ApiGateway.WebApi.csproj" />
   </ItemGroup>
 
