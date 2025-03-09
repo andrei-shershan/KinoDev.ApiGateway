@@ -3,7 +3,6 @@ using Microsoft.IdentityModel.Protocols.Configuration;
 using KinoDev.ApiGateway.Infrastructure.Extensions;
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
 using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
-using Microsoft.Extensions.Options;
 
 namespace KinoDev.ApiGateway.WebApi
 {
@@ -14,8 +13,10 @@ namespace KinoDev.ApiGateway.WebApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddOutputCache();
 
             builder.Services.AddControllers();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -77,6 +78,8 @@ namespace KinoDev.ApiGateway.WebApi
 
             app.UseCors(); // Ensure CORS middleware is used
 
+            app.UseAuthentication();
+            app.UseOutputCache();
             app.UseAuthorization();
 
             app.MapControllers();

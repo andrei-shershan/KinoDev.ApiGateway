@@ -4,6 +4,7 @@ using KinoDev.Shared.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace KinoDev.ApiGateway.WebApi.Controllers
 {
@@ -20,12 +21,29 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public async Task<IActionResult> GetMoviesAsync()
         {
             var response = await _mediator.Send(new GetMoviesQuery());
 
-            if (!response.NullOrEmpty())
+            if (!response.IsNullOrEmptyCollection())
+            {
+                return Ok(response);
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet("showing")]
+        [AllowAnonymous]
+        [OutputCache(Duration = 60, VaryByQueryKeys = new[] { "date" })]
+        public async Task<IActionResult> GetShowingMoviesAsync([FromQuery] DateTime date)
+        {
+            var response = await _mediator.Send(new GetShowingMoviesQuery()
+            {
+                Date = date
+            });
+
+            if (!response.IsNullOrEmptyCollection())
             {
                 return Ok(response);
             }
