@@ -1,22 +1,12 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies;
-using KinoDev.ApiGateway.WebApi.Controllers;
 using KinoDev.Shared.DtoModels;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace KinoDev.ApiGateway.UnitTests.Controllers
+namespace KinoDev.ApiGateway.UnitTests.Controllers.MoviesControlersTests
 {
-    public class MoviesControllerTests
+    public class GetMoviesAsyncTests : MoviesControllerBaseTests
     {
-        private readonly Mock<IMediator> _mediatorMock;
-        private readonly MoviesController _controller;
-
-        public MoviesControllerTests()
-        {
-            _mediatorMock = new Mock<IMediator>();
-            _controller = new MoviesController(_mediatorMock.Object);
-        }
 
         [Fact]
         public async Task GetMoviesAsync_ReturnsOkResult_WhenMoviesExist()

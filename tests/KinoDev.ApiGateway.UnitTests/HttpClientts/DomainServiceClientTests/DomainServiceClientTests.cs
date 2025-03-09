@@ -1,32 +1,13 @@
-﻿using KinoDev.ApiGateway.Infrastructure.HttpClients;
-using KinoDev.Shared.DtoModels;
+﻿using KinoDev.Shared.DtoModels;
 using Moq.Protected;
 using Moq;
 using System.Net;
 using KinoDev.ApiGateway.Infrastructure.Constants;
 
-namespace KinoDev.ApiGateway.UnitTests.HttpClientts
+namespace KinoDev.ApiGateway.UnitTests.HttpClientts.DomainServiceClientTests
 {
-    public class DomainServiceClientTests
+    public class DomainServiceClientTests : DomainServiceClientBaseTests
     {
-        private HttpRequestMessage _capturedRequest = null;
-        private Mock<HttpMessageHandler> _mockHttpMessageHandler = new();
-
-        private const string _baseUrl = "https://localhost/";
-
-        private readonly HttpClient _httpClient;
-        private readonly DomainServiceClient _domainServiceClient;
-
-        public DomainServiceClientTests()
-        {
-            _httpClient = new HttpClient(_mockHttpMessageHandler.Object)
-            {
-                BaseAddress = new Uri(_baseUrl)
-            };
-
-            _domainServiceClient = new DomainServiceClient(_httpClient);
-        }
-
         [Fact]
         public async Task GetMoviesAsync_ReturnsMovies()
         {
