@@ -40,7 +40,7 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
             var requestUri = QueryHelpers.AddQueryString(DomainApiEndpoints.Movies.GetShowingMovies, queryParams);
 
-            var response = await _httpClient.GetAsync(requestUri);
+            var response = await _httpClient.GetAsync($"{DomainApiEndpoints.Movies.GetShowingMovies}?date={date}");
 
             return await response.GetResponseAsync<IEnumerable<ShowingMovie>>();
         }
