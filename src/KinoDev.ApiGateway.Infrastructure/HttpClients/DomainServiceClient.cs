@@ -2,6 +2,7 @@
 using KinoDev.ApiGateway.Infrastructure.Extensions;
 using KinoDev.Shared.DtoModels;
 using KinoDev.Shared.DtoModels.ShowingMovies;
+using KinoDev.Shared.DtoModels.ShowTimes;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace KinoDev.ApiGateway.Infrastructure.HttpClients
@@ -11,6 +12,10 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
         Task<IEnumerable<MovieDto>> GetMoviesAsync();
 
         Task<IEnumerable<ShowingMovie>> GetShowingMoviesAsync(DateTime date);
+
+        Task<ShowTimeDetailsDto> GetShowTimeDetailsAsync(int showTimeId);
+
+        Task<ShowTimeSeatsDto> GetShowTimeSeatsAsync(int showTimeId);
 
         Task<string> TestCall();
     }
@@ -43,6 +48,24 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             var response = await _httpClient.GetAsync($"{DomainApiEndpoints.Movies.GetShowingMovies}?date={date}");
 
             return await response.GetResponseAsync<IEnumerable<ShowingMovie>>();
+        }
+
+        public async Task<ShowTimeDetailsDto> GetShowTimeDetailsAsync(int showTimeId)
+        {
+            var response = await _httpClient.GetAsync($"{DomainApiEndpoints.ShowTimes.GetShowTimeDetails}/{showTimeId}");
+
+            return await response.GetResponseAsync<ShowTimeDetailsDto>();
+        }
+
+        public async Task<ShowTimeSeatsDto> GetShowTimeSeatsAsync(int showTimeId)
+        {
+            var response = await _httpClient.GetAsync($"{DomainApiEndpoints.ShowTimes.GetShowTimeSeats}/{showTimeId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.GetResponseAsync<ShowTimeSeatsDto>();
+            }
+
+            return null;
         }
 
         public async Task<string> TestCall()

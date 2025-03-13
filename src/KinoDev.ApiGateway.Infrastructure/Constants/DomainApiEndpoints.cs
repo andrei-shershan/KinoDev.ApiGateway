@@ -8,5 +8,12 @@
 
             public const string GetShowingMovies = "api/movies/showing";
         }
+
+        public class ShowTimes
+        {
+            public const string GetShowTimeDetails = "api/showtimes/details";
+
+            public const string GetShowTimeSeats = "api/showtimes/seats";
+        }
     }
 }
