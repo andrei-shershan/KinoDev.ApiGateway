@@ -1,9 +1,12 @@
-﻿using KinoDev.ApiGateway.Infrastructure.Constants;
+﻿using System.Text;
+using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.Extensions;
 using KinoDev.Shared.DtoModels;
+using KinoDev.Shared.DtoModels.Orders;
 using KinoDev.Shared.DtoModels.ShowingMovies;
 using KinoDev.Shared.DtoModels.ShowTimes;
 using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json;
 
 namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 {
@@ -17,7 +20,16 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         Task<ShowTimeSeatsDto> GetShowTimeSeatsAsync(int showTimeId);
 
+        Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrderDto);
+
         Task<string> TestCall();
+    }
+
+    public class CreateOrderDto
+    {
+        public int ShowTimeId { get; set; }
+
+        public ICollection<int> SelectedSeatIds { get; set; } = new List<int>();
     }
 
     public class DomainServiceClient : IDomainServiceClient
@@ -27,6 +39,15 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
         public DomainServiceClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public async Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrderDto)
+        {
+            var requestContent = new StringContent(JsonConvert.SerializeObject(createOrderDto), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(DomainApiEndpoints.Orders.CreateOrder, requestContent);
+
+            return await response.GetResponseAsync<OrderDto>();
         }
 
         public async Task<IEnumerable<MovieDto>> GetMoviesAsync()

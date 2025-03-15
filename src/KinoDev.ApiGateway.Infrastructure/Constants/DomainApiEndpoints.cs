@@ -15,5 +15,10 @@
 
             public const string GetShowTimeSeats = "api/showtimes/seats";
         }
+
+        public class Orders
+        {
+            public const string CreateOrder = "api/orders";
+        }
     }
 }
