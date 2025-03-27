@@ -37,17 +37,17 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             if (response != null)
             {
-                Response.Cookies.Append(
-                    "order_cookie",
-                    response.Id.ToString(),
-                    new CookieOptions()
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        Domain = "localhost",
-                        Path = "/"
-                    });
+                // Response.Cookies.Append(
+                //     "order_cookie",
+                //     response.Id.ToString(),
+                //     new CookieOptions()
+                //     {
+                //         HttpOnly = true,
+                //         Secure = true,
+                //         SameSite = SameSiteMode.None,
+                //         Domain = "localhost",
+                //         Path = "/"
+                //     });
 
                 return Ok(response);
             }

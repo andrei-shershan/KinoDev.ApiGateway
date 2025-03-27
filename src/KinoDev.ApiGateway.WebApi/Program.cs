@@ -64,6 +64,14 @@ namespace KinoDev.ApiGateway.WebApi
                 .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors))
                 .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
 
+            builder.Services
+                .AddHttpClient<IPaymentClient, PaymentClient>(options =>
+                {
+                    options.BaseAddress = new Uri(apiClients.PaymentServiceUri);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors))
+                .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

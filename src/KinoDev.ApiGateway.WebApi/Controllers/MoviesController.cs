@@ -10,8 +10,8 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // [Authorize(Roles = $"{Roles.Admin},{Roles.Manager}")]
-    [AllowAnonymous]
+    [Authorize(Roles = $"{Roles.Admin}")]
+    // [AllowAnonymous]
     public class MoviesController : ControllerBase
     {
         private readonly IMediator _mediator;
