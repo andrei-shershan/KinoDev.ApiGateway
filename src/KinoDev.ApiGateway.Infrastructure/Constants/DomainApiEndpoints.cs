@@ -18,7 +18,10 @@
 
         public class Orders
         {
+            public static string CompleteOrder(string id) => $"api/orders/{id}/complete"; 
             public const string CreateOrder = "api/orders";
+            public const string GetOrderSummary = "api/orders/summary";
+            public const string GetOrder = "api/orders";
         }
     }
 }

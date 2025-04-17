@@ -1,5 +1,5 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.HttpClients;
-using KinoDev.Shared.DtoModels;
+using KinoDev.Shared.DtoModels.Movies;
 using MediatR;
 
 namespace KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies

@@ -5,9 +5,30 @@ using Newtonsoft.Json;
 
 namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 {
+    // TODO: Move to Shared project
+    // TOOD: Use models from shared project
+    public enum PaymentProvider
+    {
+        Stripe
+    }
+
+    public class GenericPaymentIntent
+    {
+        public string PaymentIntentId { get; set; }
+        public string ClientSecret { get; set; }
+        public decimal Amount { get; set; }
+        public string Currency { get; set; }
+        public Dictionary<string, string> Metadata { get; set; }
+
+        public string State { get; set; }
+
+        public PaymentProvider PaymentProvider { get; set; }
+    }
+
     public interface IPaymentClient
     {
         Task<string> CreatePaymentIntentAsync(int amount, string currency, Dictionary<string, string> metadata);
+        Task<GenericPaymentIntent> GetPaymentIntentAsync(string id);
     }
 
     public class PaymentClient : IPaymentClient
@@ -21,7 +42,6 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         public async Task<string> CreatePaymentIntentAsync(int amount, string currency, Dictionary<string, string> metadata)
         {
-            System.Console.WriteLine("!!!!!!!!!! " + JsonConvert.SerializeObject(new { amount, currency, metadata }));
             var requestContent = new StringContent(JsonConvert.SerializeObject(new { amount, currency, metadata }), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(PaymentApiEndpoints.Payments.CreatePaymentIntent, requestContent);
             if (response.IsSuccessStatusCode)
@@ -30,6 +50,18 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             }
 
             return await response.GetResponseAsync<string>();
+        }
+
+        public async Task<GenericPaymentIntent> GetPaymentIntentAsync(string id)
+        {
+            var requestUri = $"{PaymentApiEndpoints.Payments.GetPaymentIntent}/{id}";
+            var response = await _httpClient.GetAsync(requestUri);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.GetResponseAsync<GenericPaymentIntent>();
+            }
+
+            return null;
         }
     }
 }

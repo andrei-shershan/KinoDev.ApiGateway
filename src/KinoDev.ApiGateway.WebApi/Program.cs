@@ -26,10 +26,12 @@ namespace KinoDev.ApiGateway.WebApi
             {
                 options.AddDefaultPolicy(policy =>
                 {
-                    policy.AllowAnyOrigin()
+
+                    // TODO: Move to ENV/Settings
+                    policy.WithOrigins("https://ui.kinodev.localhost,https://admin-portal.kinodev.localhost,https://localhost:5173,http://localhost:5173".Split(","))
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
-                    // .AllowCredentials();
+                        .AllowAnyHeader()
+                        .AllowCredentials();
                 });
             });
 

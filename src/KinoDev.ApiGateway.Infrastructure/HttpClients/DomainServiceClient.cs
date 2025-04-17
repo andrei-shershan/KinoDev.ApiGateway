@@ -2,6 +2,7 @@
 using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.Extensions;
 using KinoDev.Shared.DtoModels;
+using KinoDev.Shared.DtoModels.Movies;
 using KinoDev.Shared.DtoModels.Orders;
 using KinoDev.Shared.DtoModels.ShowingMovies;
 using KinoDev.Shared.DtoModels.ShowTimes;
@@ -20,9 +21,15 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         Task<ShowTimeSeatsDto> GetShowTimeSeatsAsync(int showTimeId);
 
-        Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrderDto);
+        Task<OrderSummary> CreateOrderAsync(CreateOrderDto createOrderDto);
+
+        Task<OrderDto> GetOrderAsync(Guid orderId);
+
+        Task<OrderSummary> GetActiveOrderSummaryAsync(Guid orderId);
 
         Task<string> TestCall();
+
+        Task<OrderDto> CompleteOrderAsync(Guid orderId);
     }
 
     public class CreateOrderDto
@@ -41,13 +48,30 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             _httpClient = httpClient;
         }
 
-        public async Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrderDto)
+        public async Task<OrderDto> CompleteOrderAsync(Guid orderId)
+        {
+            var requestUri = DomainApiEndpoints.Orders.CompleteOrder(orderId.ToString());
+
+            var response = await _httpClient.PostAsync(requestUri, null);
+
+            return await response.GetResponseAsync<OrderDto>();
+        }
+
+        public async Task<OrderSummary> CreateOrderAsync(CreateOrderDto createOrderDto)
         {
             var requestContent = new StringContent(JsonConvert.SerializeObject(createOrderDto), Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(DomainApiEndpoints.Orders.CreateOrder, requestContent);
 
-            return await response.GetResponseAsync<OrderDto>();
+            return await response.GetResponseAsync<OrderSummary>();
+        }
+
+        public async Task<OrderSummary> GetActiveOrderSummaryAsync(Guid orderId)
+        {
+            var requestUri = $"{DomainApiEndpoints.Orders.GetOrderSummary}/{orderId}";
+            var response = await _httpClient.GetAsync(requestUri);
+
+            return await response.GetResponseAsync<OrderSummary>();
         }
 
         public async Task<IEnumerable<MovieDto>> GetMoviesAsync()
@@ -55,6 +79,14 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             var response = await _httpClient.GetAsync(DomainApiEndpoints.Movies.GetMovies);
 
             return await response.GetResponseAsync<IEnumerable<MovieDto>>();
+        }
+
+        public async Task<OrderDto> GetOrderAsync(Guid orderId)
+        {
+            var requestUri = $"{DomainApiEndpoints.Orders.GetOrder}/{orderId}";
+            var response = await _httpClient.GetAsync(requestUri);
+
+            return await response.GetResponseAsync<OrderDto>();
         }
 
         public async Task<IEnumerable<ShowingMovie>> GetShowingMoviesAsync(DateTime date)

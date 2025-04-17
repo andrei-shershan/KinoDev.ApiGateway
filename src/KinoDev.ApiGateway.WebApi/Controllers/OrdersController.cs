@@ -1,4 +1,7 @@
+using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders;
+using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Orders;
+using KinoDev.Shared.DtoModels.Orders;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,8 +29,30 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             public ICollection<int> SelectedSeatIds { get; set; } = new List<int>();
         }
 
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveOrder()
+        {
+            var orderId = Request.Cookies[ResponseCookies.CookieOrderId];
+            if (orderId == null)
+            {
+                return NotFound();
+            }
+
+            var response = await _mediator.Send(new GetActiveOrderQuery()
+            {
+                OrderId = Guid.Parse(orderId),
+            });
+
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(response);
+        }
+
         [HttpPost]
-        public async Task<IActionResult> GetUserDetails([FromBody] CreateOrderModel model)
+        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderModel model)
         {
             var response = await _mediator.Send(new CreateOrderCommand()
             {
@@ -37,19 +62,54 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             if (response != null)
             {
-                // Response.Cookies.Append(
-                //     "order_cookie",
-                //     response.Id.ToString(),
-                //     new CookieOptions()
-                //     {
-                //         HttpOnly = true,
-                //         Secure = true,
-                //         SameSite = SameSiteMode.None,
-                //         Domain = "localhost",
-                //         Path = "/"
-                //     });
+                Response.Cookies.Append(
+                    ResponseCookies.CookieOrderId,
+                    response.Id.ToString(),
+                    new CookieOptions()
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        //Domain = "localhost", // TODO: Env or Settings
+                        Path = "/",
+                        Expires = DateTime.UtcNow.AddMinutes(30)
+                    });
 
                 return Ok(response);
+            }
+
+            return BadRequest();
+        }
+
+        public class CompleteOrderModel
+        {
+            public string PaymentIntentId { get; set; }
+        }
+
+        [HttpPost("complete")]
+        public async Task<IActionResult> CompleteOrder([FromBody] CompleteOrderModel model)
+        {
+            var orderId = Request.Cookies[ResponseCookies.CookieOrderId];
+            if (orderId == null)
+            {
+                return BadRequest();
+            }
+
+            var paymentIntentId = model.PaymentIntentId;
+            if (string.IsNullOrWhiteSpace(paymentIntentId))
+            {
+                return BadRequest("PaymentIntentId is required.");
+            }
+
+            var response = await _mediator.Send(new CompleteOrderCommand()
+            {
+                OrderId = Guid.Parse(orderId),
+                PaymentIntentId = paymentIntentId
+            });
+
+            if (response != null)
+            {
+                return Ok();
             }
 
             return BadRequest();

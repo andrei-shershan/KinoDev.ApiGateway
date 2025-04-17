@@ -46,6 +46,16 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             if (!response.IsNullOrEmptyCollection())
             {
+                Response.Cookies.Append("TEST_CASE", $"{DateTime.UtcNow.Millisecond}", new CookieOptions
+                {
+                    HttpOnly = true,
+                    //Domain = "localhost", // TODO: Env or Settings
+                    Path = "/",
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    //Expires = DateTime.UtcNow.AddMinutes(30)
+                });
+
                 return Ok(response);
             }
 

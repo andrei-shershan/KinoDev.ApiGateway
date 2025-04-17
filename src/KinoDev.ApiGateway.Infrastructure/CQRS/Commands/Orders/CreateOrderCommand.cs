@@ -4,14 +4,14 @@ using MediatR;
 
 namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 {
-    public class CreateOrderCommand : IRequest<OrderDto>
+    public class CreateOrderCommand : IRequest<OrderSummary>
     {
         public int ShowTimeId { get; set; }
 
         public ICollection<int> SelectedSeatIds { get; set; } = new List<int>();
     }
 
-    public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderDto>
+    public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderSummary>
     {
         private readonly IDomainServiceClient _domainServiceClient;
 
@@ -20,7 +20,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
             _domainServiceClient = domainServiceClient;
         }
 
-        public async Task<OrderDto> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+        public async Task<OrderSummary> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             var createOrderDto = new CreateOrderDto
             {
