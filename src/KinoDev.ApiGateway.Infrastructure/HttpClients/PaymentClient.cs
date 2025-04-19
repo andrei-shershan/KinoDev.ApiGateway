@@ -29,6 +29,7 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
     {
         Task<string> CreatePaymentIntentAsync(int amount, string currency, Dictionary<string, string> metadata);
         Task<GenericPaymentIntent> GetPaymentIntentAsync(string id);
+        Task<bool> CompletePayment(string paymentIntentId);
     }
 
     public class PaymentClient : IPaymentClient
@@ -38,6 +39,14 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
         public PaymentClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public async Task<bool> CompletePayment(string paymentIntentId)
+        {
+            var requestUri = PaymentApiEndpoints.Payments.CompletePayment(paymentIntentId);
+            var response = await _httpClient.PostAsync(requestUri, null);
+            
+            return response.IsSuccessStatusCode;
         }
 
         public async Task<string> CreatePaymentIntentAsync(int amount, string currency, Dictionary<string, string> metadata)
@@ -54,7 +63,7 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         public async Task<GenericPaymentIntent> GetPaymentIntentAsync(string id)
         {
-            var requestUri = $"{PaymentApiEndpoints.Payments.GetPaymentIntent}/{id}";
+            var requestUri = PaymentApiEndpoints.Payments.GetPaymentIntent(id);
             var response = await _httpClient.GetAsync(requestUri);
             if (response.IsSuccessStatusCode)
             {
@@ -63,5 +72,6 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
             return null;
         }
+
     }
 }

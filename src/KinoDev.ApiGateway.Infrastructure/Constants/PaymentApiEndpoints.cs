@@ -4,8 +4,11 @@ namespace KinoDev.ApiGateway.Infrastructure.Constants
     {
         public class Payments
         {
-            public const string CreatePaymentIntent = "api/payments/create-payment-intent";
-            public const string GetPaymentIntent = "api/payments/payment-intents";
+            public const string CreatePaymentIntent = "api/payments";
+            
+            public static string GetPaymentIntent(string paymentIntentId) => $"api/payments/{paymentIntentId}";
+
+            public static string CompletePayment(string paymentIntentId) => $"api/payments/{paymentIntentId}/complete";
         }
     }
 }

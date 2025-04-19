@@ -109,6 +109,34 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             if (response != null)
             {
+                // TODO: Move to service?
+                Response.Cookies.Append(
+                    ResponseCookies.CookieOrderId,
+                    orderId,
+                    new CookieOptions()
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        //Domain = "localhost", // TODO: Env or Settings
+                        Path = "/",
+                        Expires = default(DateTime)
+                    });
+
+                // TODO: Move to service?
+                Response.Cookies.Append(
+                    ResponseCookies.PaidOrderId,
+                    orderId,
+                    new CookieOptions()
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        //Domain = "localhost", // TODO: Env or Settings
+                        Path = "/",
+                        Expires = DateTime.UtcNow.AddMinutes(30)
+                    });
+
                 return Ok();
             }
 

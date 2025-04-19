@@ -43,11 +43,6 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
                 return null;
             }
 
-            if (paymentIntent.State != "succeeded")
-            {
-                return null;
-            }
-
             if (!paymentIntent.Metadata.ContainsKey("orderId"))
             {
                 return null;
