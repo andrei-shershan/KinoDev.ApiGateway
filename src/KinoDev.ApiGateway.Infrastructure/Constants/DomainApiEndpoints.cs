@@ -18,10 +18,12 @@
 
         public class Orders
         {
-            public static string CompleteOrder(string id) => $"api/orders/{id}/complete"; 
+            public static string CompleteOrder(Guid id) => $"api/orders/{id}/complete"; 
             public const string CreateOrder = "api/orders";
             public const string GetOrderSummary = "api/orders/summary";
             public const string GetOrder = "api/orders";
+
+            public static string DeleteActiveOrder(Guid id) => $"api/orders/{id}";
         }
     }
 }

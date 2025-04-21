@@ -30,6 +30,8 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
         Task<string> TestCall();
 
         Task<OrderDto> CompleteOrderAsync(Guid orderId);
+
+        Task<bool> DeleteActiveOrder(Guid orderId);
     }
 
     public class CreateOrderDto
@@ -50,7 +52,7 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         public async Task<OrderDto> CompleteOrderAsync(Guid orderId)
         {
-            var requestUri = DomainApiEndpoints.Orders.CompleteOrder(orderId.ToString());
+            var requestUri = DomainApiEndpoints.Orders.CompleteOrder(orderId);
 
             var response = await _httpClient.PostAsync(requestUri, null);
 
@@ -130,6 +132,22 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             }
 
             return null;
+        }
+
+        public async Task<bool> DeleteActiveOrder(Guid orderId)
+        {
+            var requestUri = DomainApiEndpoints.Orders.DeleteActiveOrder(orderId);
+            var response = await _httpClient.DeleteAsync(requestUri);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<bool>(result);
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

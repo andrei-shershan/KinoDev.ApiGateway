@@ -149,5 +149,38 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             return BadRequest("Order not found or already completed.");
         }
+
+        [HttpDelete("active")]
+        public async Task<IActionResult> CancelActiveOrder()
+        {
+            var orderId = Request.Cookies[ResponseCookies.CookieOrderId];
+            if (orderId == null)
+            {
+                return NotFound();
+            }
+
+            var response = await _mediator.Send(new CancelActiveOrderCommand()
+            {
+                OrderId = Guid.Parse(orderId),
+            });
+
+            if (response)
+            {
+                Response.Cookies.Append(
+                    ResponseCookies.CookieOrderId,
+                    orderId,
+                    new CookieOptions()
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        //Domain = "localhost", // TODO: Env or Settings
+                        Path = "/",
+                        Expires = default(DateTime)
+                    });                return Ok();
+            }
+
+            return BadRequest("Order not found or already completed.");
+        }
     }
 }
