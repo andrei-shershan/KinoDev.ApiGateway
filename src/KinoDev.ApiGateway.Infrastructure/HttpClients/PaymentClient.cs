@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text;
 using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.Extensions;
@@ -27,9 +28,11 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
     public interface IPaymentClient
     {
-        Task<string> CreatePaymentIntentAsync(int amount, string currency, Dictionary<string, string> metadata);
+        Task<string> CreatePaymentIntentAsync(Guid orderId, decimal amount, string currency, Dictionary<string, string> metadata);
         Task<GenericPaymentIntent> GetPaymentIntentAsync(string id);
         Task<bool> CompletePayment(string paymentIntentId);
+
+        Task<bool> CancelPendingOrderPayments(Guid orderId);
     }
 
     public class PaymentClient : IPaymentClient
@@ -41,17 +44,25 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             _httpClient = httpClient;
         }
 
+        public async Task<bool> CancelPendingOrderPayments(Guid orderId)
+        {
+            var requestUri = PaymentApiEndpoints.Payments.CancelPendingOrderPayments(orderId);
+            var response = await _httpClient.PostAsync(requestUri, null);
+
+            return response.IsSuccessStatusCode;
+        }
+
         public async Task<bool> CompletePayment(string paymentIntentId)
         {
             var requestUri = PaymentApiEndpoints.Payments.CompletePayment(paymentIntentId);
             var response = await _httpClient.PostAsync(requestUri, null);
-            
+
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<string> CreatePaymentIntentAsync(int amount, string currency, Dictionary<string, string> metadata)
+        public async Task<string> CreatePaymentIntentAsync(Guid orderId, decimal amount, string currency, Dictionary<string, string> metadata)
         {
-            var requestContent = new StringContent(JsonConvert.SerializeObject(new { amount, currency, metadata }), Encoding.UTF8, "application/json");
+            var requestContent = new StringContent(JsonConvert.SerializeObject(new { orderId = orderId.ToString(), amount, currency, metadata }), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(PaymentApiEndpoints.Payments.CreatePaymentIntent, requestContent);
             if (response.IsSuccessStatusCode)
             {
@@ -65,12 +76,8 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
         {
             var requestUri = PaymentApiEndpoints.Payments.GetPaymentIntent(id);
             var response = await _httpClient.GetAsync(requestUri);
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.GetResponseAsync<GenericPaymentIntent>();
-            }
 
-            return null;
+            return await response.GetResponseAsync<GenericPaymentIntent>();
         }
 
     }

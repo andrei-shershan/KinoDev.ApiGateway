@@ -53,6 +53,8 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
                 return null;
             }
 
+            await _paymentClient.CompletePayment(request.PaymentIntentId);
+
             return await _domainServiceClient.CompleteOrderAsync(request.OrderId);
         }
     }

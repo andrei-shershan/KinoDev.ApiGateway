@@ -27,7 +27,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Orders
                 return null;
             }
             
-            return await _domainServiceClient.GetActiveOrderSummaryAsync(request.OrderId);            
+            return await _domainServiceClient.GetOrderSummaryAsync(request.OrderId);            
         }
     }
 }

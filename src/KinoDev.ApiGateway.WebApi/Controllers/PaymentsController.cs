@@ -1,3 +1,4 @@
+using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Payments;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -27,15 +28,18 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             public Dictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>();
         }
 
-        [HttpPost("create-payment-intent")]
-        public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentIntentModel model)
+        [HttpPost("")]
+        public async Task<IActionResult> CreatePayment()
         {
-            System.Console.WriteLine("!!!!!!!!!! " + model.Metadata?.Count());
+            var orderId = Request.Cookies[ResponseCookies.CookieOrderId];
+            if (orderId == null)
+            {
+                return BadRequest();
+            }
+
             var response = await _mediator.Send(new CreatePaymentIntentCommand
             {
-                Amount = model.Amount,
-                Currency = model.Currency,
-                Metadata = model.Metadata
+                OrderId = Guid.Parse(orderId)
             });
 
             if (response == null)

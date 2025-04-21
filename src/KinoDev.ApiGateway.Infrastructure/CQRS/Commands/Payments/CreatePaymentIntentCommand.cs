@@ -5,30 +5,45 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Payments
 {
     public class CreatePaymentIntentCommand : IRequest<string>
     {
-        public int Amount { get; set; }
-
-        public string Currency { get; set; }
-
-        public Dictionary<string, string> Metadata { get; set; }
+        public Guid OrderId { get; set; }
     }
 
     public class CreatePaymentIntentCommandHandler : IRequestHandler<CreatePaymentIntentCommand, string>
     {
         private readonly IPaymentClient _paymentClient;
+        private readonly IDomainServiceClient _domainServiceClient;
 
-        public CreatePaymentIntentCommandHandler(IPaymentClient paymentClient)
+        public CreatePaymentIntentCommandHandler(IPaymentClient paymentClient, IDomainServiceClient domainServiceClient)
         {
             _paymentClient = paymentClient;
+            _domainServiceClient = domainServiceClient;
         }
 
         public async Task<string> Handle(CreatePaymentIntentCommand request, CancellationToken cancellationToken)
         {
-            if (request.Metadata == null)
+            var orderSummary = await _domainServiceClient.GetOrderSummaryAsync(request.OrderId);
+            if (orderSummary == null || orderSummary.State != Shared.Enums.OrderState.New)
             {
-                request.Metadata = new Dictionary<string, string>();
+                return null;
             }
 
-            return await _paymentClient.CreatePaymentIntentAsync(request.Amount, request.Currency, request.Metadata);
+            var metadata = new Dictionary<string, string>();
+
+            // TODO: Move to SHARED constants
+            metadata["orderId"] = orderSummary.Id.ToString();
+            metadata["movie"] = orderSummary.ShowTimeSummary.Movie.Name;
+
+            foreach (var ticket in orderSummary.Tickets)
+            {
+                metadata[$"{ticket.Row}_{ticket.Number}"] = $"row: {ticket.Row}, number: {ticket.Number}";
+            }
+
+            return await _paymentClient.CreatePaymentIntentAsync(
+                request.OrderId,
+                orderSummary.Cost,
+                "usd",
+                metadata
+                );
         }
     }
 }

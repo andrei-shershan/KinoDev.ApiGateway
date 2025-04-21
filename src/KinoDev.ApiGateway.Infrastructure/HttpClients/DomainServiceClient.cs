@@ -25,7 +25,7 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         Task<OrderDto> GetOrderAsync(Guid orderId);
 
-        Task<OrderSummary> GetActiveOrderSummaryAsync(Guid orderId);
+        Task<OrderSummary> GetOrderSummaryAsync(Guid orderId);
 
         Task<string> TestCall();
 
@@ -66,7 +66,7 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             return await response.GetResponseAsync<OrderSummary>();
         }
 
-        public async Task<OrderSummary> GetActiveOrderSummaryAsync(Guid orderId)
+        public async Task<OrderSummary> GetOrderSummaryAsync(Guid orderId)
         {
             var requestUri = $"{DomainApiEndpoints.Orders.GetOrderSummary}/{orderId}";
             var response = await _httpClient.GetAsync(requestUri);

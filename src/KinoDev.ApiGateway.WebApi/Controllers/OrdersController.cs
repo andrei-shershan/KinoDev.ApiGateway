@@ -51,7 +51,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             return Ok(response);
         }
 
-        [HttpPost]
+        [HttpPost("")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderModel model)
         {
             var response = await _mediator.Send(new CreateOrderCommand()
@@ -92,7 +92,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             var orderId = Request.Cookies[ResponseCookies.CookieOrderId];
             if (orderId == null)
             {
-                return BadRequest();
+                return BadRequest($"OrderId is required.");
             }
 
             var paymentIntentId = model.PaymentIntentId;
@@ -124,9 +124,16 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                     });
 
                 // TODO: Move to service?
+                var completedCookieValue = orderId;
+                var existingPaidOrderId = Request.Cookies[ResponseCookies.PaidOrderId];
+                if (existingPaidOrderId != null)
+                {
+                    completedCookieValue = existingPaidOrderId + ";" + orderId;
+                }
+
                 Response.Cookies.Append(
                     ResponseCookies.PaidOrderId,
-                    orderId,
+                    completedCookieValue,
                     new CookieOptions()
                     {
                         HttpOnly = true,
@@ -140,7 +147,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                 return Ok();
             }
 
-            return BadRequest();
+            return BadRequest("Order not found or already completed.");
         }
     }
 }
