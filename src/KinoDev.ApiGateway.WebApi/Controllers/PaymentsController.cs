@@ -28,8 +28,13 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             public Dictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>();
         }
 
+        public class CreatePaymentRequest
+        {
+            public string Email { get; set; }
+        }
+
         [HttpPost("")]
-        public async Task<IActionResult> CreatePayment()
+        public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest model)
         {
             var orderId = Request.Cookies[ResponseCookies.CookieOrderId];
             if (orderId == null)
@@ -39,7 +44,8 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             var response = await _mediator.Send(new CreatePaymentIntentCommand
             {
-                OrderId = Guid.Parse(orderId)
+                OrderId = Guid.Parse(orderId),
+                Email = model.Email
             });
 
             if (response == null)

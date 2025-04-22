@@ -5,6 +5,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Payments
 {
     public class CreatePaymentIntentCommand : IRequest<string>
     {
+        public string Email { get; set; }
         public Guid OrderId { get; set; }
     }
 
@@ -21,11 +22,17 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Payments
 
         public async Task<string> Handle(CreatePaymentIntentCommand request, CancellationToken cancellationToken)
         {
+            var updatedOrder = await _domainServiceClient.UpdateOrderEmailAsync(request.OrderId, request.Email);
+            if (updatedOrder == null)
+            {
+                return null;
+            }
+
             var orderSummary = await _domainServiceClient.GetOrderSummaryAsync(request.OrderId);
             if (orderSummary == null || orderSummary.State != Shared.Enums.OrderState.New)
             {
                 return null;
-            }
+            }            
 
             var metadata = new Dictionary<string, string>();
 

@@ -23,6 +23,8 @@
             public const string GetOrderSummary = "api/orders/summary";
             public const string GetOrder = "api/orders";
 
+            public static string UpdateOrderEmail(Guid id) => $"api/orders/{id}/email";
+
             public static string DeleteActiveOrder(Guid id) => $"api/orders/{id}";
         }
     }
