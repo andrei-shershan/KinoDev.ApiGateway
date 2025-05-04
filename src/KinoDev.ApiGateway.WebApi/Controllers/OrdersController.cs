@@ -1,6 +1,7 @@
 using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Orders;
+using KinoDev.ApiGateway.WebApi.Models;
 using KinoDev.Shared.DtoModels.Orders;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -20,13 +21,6 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         public OrdersController(IMediator mediator)
         {
             _mediator = mediator;
-        }
-
-        public class CreateOrderModel
-        {
-            public int ShowTimeId { get; set; }
-
-            public ICollection<int> SelectedSeatIds { get; set; } = new List<int>();
         }
 
         [HttpGet("active")]
@@ -81,11 +75,6 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             return BadRequest();
         }
 
-        public class GetCompletedOrdersModel
-        {
-            public string Email { get; set; }
-        }
-
         [HttpPost("completed")]
         public async Task<IActionResult> GetCompletedOrders([FromBody] GetCompletedOrdersModel model)
         {
@@ -98,19 +87,14 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             var orderIds = paidOrdersCookie
                 .Split(new[] { ";", "%3B" }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(id => Guid.Parse(id));
-                
-            var response = await _mediator.Send(new GetCompletedOrdersCommand 
-            { 
+
+            var response = await _mediator.Send(new GetCompletedOrdersCommand
+            {
                 OrderIds = orderIds,
-                Email = model.Email 
+                Email = model.Email
             });
 
             return Ok(response);
-        }
-
-        public class CompleteOrderModel
-        {
-            public string PaymentIntentId { get; set; }
         }
 
         [HttpPost("complete")]
@@ -204,7 +188,9 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                         //Domain = "localhost", // TODO: Env or Settings
                         Path = "/",
                         Expires = default(DateTime)
-                    });                return Ok();
+                    });
+
+                return Ok();
             }
 
             return BadRequest("Order not found or already completed.");

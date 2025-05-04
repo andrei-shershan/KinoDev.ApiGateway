@@ -26,12 +26,12 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         {
             var response = await _mediator.Send(new GetMoviesQuery());
 
-            if (!response.IsNullOrEmptyCollection())
+            if (response.IsNullOrEmptyCollection())
             {
-                return Ok(response);
+                return NotFound();
             }
 
-            return NotFound();
+            return Ok(response);
         }
 
         [HttpGet("showing")]
@@ -44,22 +44,13 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                 Date = date
             });
 
-            if (!response.IsNullOrEmptyCollection())
+            if (response.IsNullOrEmptyCollection())
             {
-                Response.Cookies.Append("TEST_CASE", $"{DateTime.UtcNow.Millisecond}", new CookieOptions
-                {
-                    HttpOnly = true,
-                    //Domain = "localhost", // TODO: Env or Settings
-                    Path = "/",
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    //Expires = DateTime.UtcNow.AddMinutes(30)
-                });
+                return NotFound();
 
-                return Ok(response);
             }
 
-            return NotFound();
+            return Ok(response);
         }
     }
 }
