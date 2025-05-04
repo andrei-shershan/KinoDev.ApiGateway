@@ -1,8 +1,8 @@
-﻿using KinoDev.Shared.DtoModels;
-using Moq.Protected;
+﻿using Moq.Protected;
 using Moq;
 using System.Net;
 using KinoDev.ApiGateway.Infrastructure.Constants;
+using KinoDev.Shared.DtoModels.Movies;
 
 namespace KinoDev.ApiGateway.UnitTests.HttpClientts.DomainServiceClientTests
 {

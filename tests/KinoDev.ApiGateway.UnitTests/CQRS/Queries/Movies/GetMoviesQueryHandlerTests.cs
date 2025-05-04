@@ -1,6 +1,6 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies;
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
-using KinoDev.Shared.DtoModels;
+using KinoDev.Shared.DtoModels.Movies;
 using Moq;
 
 namespace KinoDev.ApiGateway.UnitTests.CQRS.Queries.Movies

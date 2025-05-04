@@ -23,7 +23,7 @@ namespace KinoDev.ApiGateway.UnitTests.HttpClientts.DomainServiceClientTests
                     Name = "Movie 1",
                     Duration = 120,
                     Url = "https://movie1.com",
-                    MovieShowTimeDetails = new List<MovieShowTimeDetails>()
+                    MoviesShowTimeDetails = new List<MovieShowTimeDetails>()
                     {
                         new MovieShowTimeDetails()
                         {
@@ -58,7 +58,7 @@ namespace KinoDev.ApiGateway.UnitTests.HttpClientts.DomainServiceClientTests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Contains(result, x => x.Id == 1 && x.Name == "Movie 1" && x.MovieShowTimeDetails.FirstOrDefault(st => st.HallName == "Hall 1") != null);
+            Assert.Contains(result, x => x.Id == 1 && x.Name == "Movie 1" && x.MoviesShowTimeDetails.FirstOrDefault(st => st.HallName == "Hall 1") != null);
 
 
             // Validate the called URI

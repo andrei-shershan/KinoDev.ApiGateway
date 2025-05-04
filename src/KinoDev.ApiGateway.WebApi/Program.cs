@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Protocols.Configuration;
 using KinoDev.ApiGateway.Infrastructure.Extensions;
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
 using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
+using Serilog;
 
 namespace KinoDev.ApiGateway.WebApi
 {
@@ -11,6 +12,10 @@ namespace KinoDev.ApiGateway.WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Configure Serilog
+            builder.Host.UseSerilog((context, configuration) => 
+                configuration.ReadFrom.Configuration(context.Configuration));
 
             // Add services to the container.
             builder.Services.AddOutputCache();
@@ -26,10 +31,12 @@ namespace KinoDev.ApiGateway.WebApi
             {
                 options.AddDefaultPolicy(policy =>
                 {
-                    policy.AllowAnyOrigin()
+
+                    // TODO: Move to ENV/Settings
+                    policy.WithOrigins("https://ui.kinodev.localhost,https://admin-portal.kinodev.localhost,https://localhost:5173,http://localhost:5173".Split(","))
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
-                    // .AllowCredentials();
+                        .AllowAnyHeader()
+                        .AllowCredentials();
                 });
             });
 
@@ -45,7 +52,7 @@ namespace KinoDev.ApiGateway.WebApi
 
             builder.Services.SetupAuthentication(authenticationSettings);
 
-            builder.Services.InitializeInfrastructure();
+            builder.Services.InitializeInfrastructure(builder.Configuration);
 
             builder.Services.AddTransient<InternalAuthenticationDelegationHandler>();
 
@@ -60,6 +67,14 @@ namespace KinoDev.ApiGateway.WebApi
                 .AddHttpClient<IDomainServiceClient, DomainServiceClient>(options =>
                 {
                     options.BaseAddress = new Uri(apiClients.DomainServiceUri);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors))
+                .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
+
+            builder.Services
+                .AddHttpClient<IPaymentClient, PaymentClient>(options =>
+                {
+                    options.BaseAddress = new Uri(apiClients.PaymentServiceUri);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors))
                 .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();

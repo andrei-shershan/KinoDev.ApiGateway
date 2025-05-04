@@ -6,7 +6,8 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    // [Authorize]
+    [AllowAnonymous]
     public class UsersController : ControllerBase
     {
         [HttpGet("details")]

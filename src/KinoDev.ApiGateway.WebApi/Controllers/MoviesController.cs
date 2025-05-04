@@ -10,7 +10,8 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = $"{Roles.Admin},{Roles.Manager}")]
+    [Authorize(Roles = $"{Roles.Admin}")]
+    // [AllowAnonymous]
     public class MoviesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -25,17 +26,17 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         {
             var response = await _mediator.Send(new GetMoviesQuery());
 
-            if (!response.IsNullOrEmptyCollection())
+            if (response.IsNullOrEmptyCollection())
             {
-                return Ok(response);
+                return NotFound();
             }
 
-            return NotFound();
+            return Ok(response);
         }
 
         [HttpGet("showing")]
         [AllowAnonymous]
-        [OutputCache(Duration = 60, VaryByQueryKeys = new[] { "date" })]
+        //[OutputCache(Duration = 60, VaryByQueryKeys = new[] { "date" })]
         public async Task<IActionResult> GetShowingMoviesAsync([FromQuery] DateTime date)
         {
             var response = await _mediator.Send(new GetShowingMoviesQuery()
@@ -43,12 +44,13 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                 Date = date
             });
 
-            if (!response.IsNullOrEmptyCollection())
+            if (response.IsNullOrEmptyCollection())
             {
-                return Ok(response);
+                return NotFound();
+
             }
 
-            return NotFound();
+            return Ok(response);
         }
     }
 }
