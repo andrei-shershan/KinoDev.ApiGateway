@@ -20,6 +20,8 @@ namespace KinoDev.ApiGateway.Infrastructure.Extensions
 
             services.AddSerilogServices(configuration);
 
+            services.AddTransient<ICookieResponseService, CookieResponseService>();
+
             return services;
         }
     }

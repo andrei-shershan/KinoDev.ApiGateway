@@ -1,12 +1,11 @@
 using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Orders;
+using KinoDev.ApiGateway.Infrastructure.Services;
 using KinoDev.ApiGateway.WebApi.Models;
-using KinoDev.Shared.DtoModels.Orders;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace KinoDev.ApiGateway.WebApi.Controllers
 {
@@ -17,10 +16,12 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ICookieResponseService _cookieResponseService;
 
-        public OrdersController(IMediator mediator)
+        public OrdersController(IMediator mediator, ICookieResponseService cookieResponseService)
         {
             _mediator = mediator;
+            _cookieResponseService = cookieResponseService;
         }
 
         [HttpGet("active")]
@@ -56,18 +57,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             if (response != null)
             {
-                Response.Cookies.Append(
-                    ResponseCookies.CookieOrderId,
-                    response.Id.ToString(),
-                    new CookieOptions()
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        //Domain = "localhost", // TODO: Env or Settings
-                        Path = "/",
-                        Expires = DateTime.UtcNow.AddMinutes(30)
-                    });
+                _cookieResponseService.AppendToCookieResponse(Response.Cookies, ResponseCookies.CookieOrderId, response.Id.ToString(), DateTime.UtcNow.AddMinutes(30));
 
                 return Ok(response);
             }
@@ -120,19 +110,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             if (response != null)
             {
-                // TODO: Move to service?
-                Response.Cookies.Append(
-                    ResponseCookies.CookieOrderId,
-                    orderId,
-                    new CookieOptions()
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        //Domain = "localhost", // TODO: Env or Settings
-                        Path = "/",
-                        Expires = default(DateTime)
-                    });
+                _cookieResponseService.ResetCookie(Response.Cookies, ResponseCookies.CookieOrderId, orderId);
 
                 // TODO: Move to service?
                 var completedCookieValue = orderId;
@@ -142,18 +120,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                     completedCookieValue = existingPaidOrderId + ";" + orderId;
                 }
 
-                Response.Cookies.Append(
-                    ResponseCookies.PaidOrderId,
-                    completedCookieValue,
-                    new CookieOptions()
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        //Domain = "localhost", // TODO: Env or Settings
-                        Path = "/",
-                        Expires = DateTime.UtcNow.AddMinutes(30)
-                    });
+                _cookieResponseService.AppendToCookieResponse(Response.Cookies, ResponseCookies.PaidOrderId, completedCookieValue, DateTime.UtcNow.AddMinutes(30));
 
                 return Ok();
             }
@@ -177,18 +144,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             if (response)
             {
-                Response.Cookies.Append(
-                    ResponseCookies.CookieOrderId,
-                    orderId,
-                    new CookieOptions()
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None,
-                        //Domain = "localhost", // TODO: Env or Settings
-                        Path = "/",
-                        Expires = default(DateTime)
-                    });
+                _cookieResponseService.ResetCookie(Response.Cookies, ResponseCookies.CookieOrderId, orderId);
 
                 return Ok();
             }

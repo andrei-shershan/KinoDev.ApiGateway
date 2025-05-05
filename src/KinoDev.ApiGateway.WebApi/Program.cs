@@ -43,12 +43,15 @@ namespace KinoDev.ApiGateway.WebApi
             var authenticationSettings = builder.Configuration.GetSection("Authentication").Get<AuthenticationSettings>();
             var apiClients = builder.Configuration.GetSection("ApiClients").Get<ApiClientsSettings>();
             var appBuilderSettigns = builder.Configuration.GetSection("AppBuilder").Get<AppBuilderSettigns>();
-            if (authenticationSettings == null || apiClients == null || appBuilderSettigns == null)
+            var cookieResponseSettings = builder.Configuration.GetSection("CookieResponse").Get<CookieResponseSettings>();
+            if (authenticationSettings == null || apiClients == null || appBuilderSettigns == null || cookieResponseSettings == null)
             {
-                throw new InvalidConfigurationException("Cannot obtain AuthenticationSettings from settings!");
+                throw new InvalidConfigurationException("Cannot obtain from settings!");
             }
 
             builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSection("Authentication"));
+
+            builder.Services.Configure<CookieResponseSettings>(builder.Configuration.GetSection("CookieResponse"));
 
             builder.Services.SetupAuthentication(authenticationSettings);
 
