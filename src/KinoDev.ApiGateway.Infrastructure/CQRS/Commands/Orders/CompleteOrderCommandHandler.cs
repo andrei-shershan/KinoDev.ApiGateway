@@ -1,9 +1,12 @@
 namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 {
     using KinoDev.ApiGateway.Infrastructure.HttpClients;
+    using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
+    using KinoDev.ApiGateway.Infrastructure.Services;
     using KinoDev.Shared.DtoModels.Orders;
     using MediatR;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
 
     public class CompleteOrderCommand : IRequest<OrderDto>
     {
@@ -13,19 +16,25 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 
     public class CompleteOrderCommandHandler : IRequestHandler<CompleteOrderCommand, OrderDto>
     {
-
         private readonly IDomainServiceClient _domainServiceClient;
         private readonly IPaymentClient _paymentClient;
         private readonly ILogger<CompleteOrderCommandHandler> _logger;
+        private readonly IMessageBrokerService _messageBrokerService;
+
+        private readonly MessageBrokerSettings _messageBrokerSettings;
 
         public CompleteOrderCommandHandler(
             IDomainServiceClient domainServiceClient,
             IPaymentClient paymentClient,
-            ILogger<CompleteOrderCommandHandler> logger)
+            ILogger<CompleteOrderCommandHandler> logger,
+            IMessageBrokerService messageBrokerService,
+            IOptions<MessageBrokerSettings> messageBrokerOptions)
         {
             _domainServiceClient = domainServiceClient;
             _paymentClient = paymentClient;
             _logger = logger;
+            _messageBrokerService = messageBrokerService;
+            _messageBrokerSettings = messageBrokerOptions.Value;
         }
 
         public async Task<OrderDto> Handle(CompleteOrderCommand request, CancellationToken cancellationToken)
@@ -66,7 +75,42 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 
             await _paymentClient.CompletePayment(request.PaymentIntentId);
 
-            return await _domainServiceClient.CompleteOrderAsync(request.OrderId);
+            var completedOrder = await _domainServiceClient.CompleteOrderAsync(request.OrderId);
+
+            if (completedOrder != null)
+            {
+                try
+                {
+                    _logger.LogInformation(_messageBrokerService == null ? "Message broker service is null" : "Message broker service is not null");
+                    _logger.LogInformation("Message broker settings: {@MessageBrokerSettings}", _messageBrokerSettings);
+                    _logger.LogInformation("Publishing order completion event for OrderId: {OrderId}", completedOrder.Id);
+                    _logger.LogInformation("Order completed event data: {@EventData}", new
+                    {
+                        OrderId = completedOrder.Id,
+                        Email = completedOrder.Email,
+                        CompletedAt = DateTime.UtcNow
+                    });
+                    // Publish order completed event to RabbitMQ
+                    await _messageBrokerService.PublishAsync(
+                        new
+                        {
+                            OrderId = completedOrder.Id,
+                            Email = completedOrder.Email,
+                            CompletedAt = DateTime.UtcNow
+                        },
+                        _messageBrokerSettings.Topics.OrderCompleted
+                    );
+
+                    _logger.LogInformation("Published order completion event for OrderId: {OrderId}", completedOrder.Id);
+                }
+                catch (Exception ex)
+                {
+                    // Log but don't fail the operation if message publishing fails
+                    _logger.LogError(ex, "Failed to publish order completion event for OrderId: {OrderId}", completedOrder.Id);
+                }
+            }
+
+            return completedOrder;
         }
     }
 }
