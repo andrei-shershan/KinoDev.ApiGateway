@@ -4,6 +4,7 @@ using KinoDev.ApiGateway.Infrastructure.Extensions;
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
 using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
 using Serilog;
+using KinoDev.Shared.Models;
 
 namespace KinoDev.ApiGateway.WebApi
 {

@@ -1,3 +1,4 @@
+using KinoDev.Shared.Services;
 using Microsoft.Extensions.Hosting;
 
 namespace KinoDev.ApiGateway.Infrastructure.Services
@@ -11,16 +12,14 @@ namespace KinoDev.ApiGateway.Infrastructure.Services
             _messageBrokerService = messageBrokerService;
         }
 
-
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            System.Console.WriteLine("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-            return  _messageBrokerService.SubscribeAsync("order-completed", async (message) =>
-            {
-                // Handle the message here. For example, you can log it or process it.
-                Console.WriteLine($"Received message: {message}");
-                System.Console.WriteLine("**********************");
-            });
+            // return  _messageBrokerService.SubscribeAsync("order-completed", "queue-api-gateway", async (message) =>
+            // {
+            //     // Handle the message here. For example, you can log it or process it.
+            // });
+
+            return Task.CompletedTask;
         }
     }
 }

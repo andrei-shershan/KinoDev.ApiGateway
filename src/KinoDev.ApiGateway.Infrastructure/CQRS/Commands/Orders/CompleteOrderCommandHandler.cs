@@ -4,6 +4,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
     using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
     using KinoDev.ApiGateway.Infrastructure.Services;
     using KinoDev.Shared.DtoModels.Orders;
+    using KinoDev.Shared.Services;
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
@@ -76,20 +77,10 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
             await _paymentClient.CompletePayment(request.PaymentIntentId);
 
             var completedOrder = await _domainServiceClient.CompleteOrderAsync(request.OrderId);
-
             if (completedOrder != null)
             {
                 try
                 {
-                    _logger.LogInformation(_messageBrokerService == null ? "Message broker service is null" : "Message broker service is not null");
-                    _logger.LogInformation("Message broker settings: {@MessageBrokerSettings}", _messageBrokerSettings);
-                    _logger.LogInformation("Publishing order completion event for OrderId: {OrderId}", completedOrder.Id);
-                    _logger.LogInformation("Order completed event data: {@EventData}", new
-                    {
-                        OrderId = completedOrder.Id,
-                        Email = completedOrder.Email,
-                        CompletedAt = DateTime.UtcNow
-                    });
                     // Publish order completed event to RabbitMQ
                     await _messageBrokerService.PublishAsync(
                         new
