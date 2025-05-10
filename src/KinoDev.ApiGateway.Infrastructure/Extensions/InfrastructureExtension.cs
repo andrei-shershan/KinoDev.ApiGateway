@@ -1,4 +1,5 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.Services;
+using KinoDev.Shared.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -11,7 +12,8 @@ namespace KinoDev.ApiGateway.Infrastructure.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddMediatR(cfg => {
+            services.AddMediatR(cfg =>
+            {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             });
 
@@ -21,6 +23,10 @@ namespace KinoDev.ApiGateway.Infrastructure.Extensions
             services.AddSerilogServices(configuration);
 
             services.AddTransient<ICookieResponseService, CookieResponseService>();
+
+            services.AddSingleton<IMessageBrokerService, RabbitMQService>();
+
+            services.AddHostedService<MessagingSubscriber>();
 
             return services;
         }
