@@ -81,14 +81,10 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
             {
                 try
                 {
+                    var orderSummary = await _domainServiceClient.GetOrderSummaryAsync(completedOrder.Id);
                     // Publish order completed event to RabbitMQ
                     await _messageBrokerService.PublishAsync(
-                        new
-                        {
-                            OrderId = completedOrder.Id,
-                            Email = completedOrder.Email,
-                            CompletedAt = DateTime.UtcNow
-                        },
+                        orderSummary,
                         _messageBrokerSettings.Topics.OrderCompleted
                     );
 
