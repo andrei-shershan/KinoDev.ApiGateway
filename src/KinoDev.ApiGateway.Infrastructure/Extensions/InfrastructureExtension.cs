@@ -26,6 +26,8 @@ namespace KinoDev.ApiGateway.Infrastructure.Extensions
 
             services.AddSingleton<IMessageBrokerService, RabbitMQService>();
 
+            services.AddScoped<ICacheKeyService, CacheKeyService>();
+
             services.AddHostedService<MessagingSubscriber>();
 
             return services;
