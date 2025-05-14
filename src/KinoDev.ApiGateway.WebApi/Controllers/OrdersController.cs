@@ -1,11 +1,15 @@
 using KinoDev.ApiGateway.Infrastructure.Constants;
+using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Emails;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Orders;
+using KinoDev.ApiGateway.Infrastructure.Models.Enums;
 using KinoDev.ApiGateway.Infrastructure.Services;
 using KinoDev.ApiGateway.WebApi.Models;
+using KinoDev.Shared.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace KinoDev.ApiGateway.WebApi.Controllers
 {
@@ -18,10 +22,13 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         private readonly IMediator _mediator;
         private readonly ICookieResponseService _cookieResponseService;
 
-        public OrdersController(IMediator mediator, ICookieResponseService cookieResponseService)
+        private readonly IMemoryCache _memoryCache;
+
+        public OrdersController(IMediator mediator, ICookieResponseService cookieResponseService, IMemoryCache memoryCache)
         {
             _mediator = mediator;
             _cookieResponseService = cookieResponseService;
+            _memoryCache = memoryCache;
         }
 
         [HttpGet("active")]
@@ -65,8 +72,8 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             return BadRequest();
         }
 
-        [HttpPost("completed")]
-        public async Task<IActionResult> GetCompletedOrders([FromBody] GetCompletedOrdersModel model)
+        [HttpGet("completed")]
+        public async Task<IActionResult> GetCompletedOrders()
         {
             var paidOrdersCookie = Request.Cookies[ResponseCookies.PaidOrderId];
             if (string.IsNullOrEmpty(paidOrdersCookie))
@@ -81,7 +88,6 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             var response = await _mediator.Send(new GetCompletedOrdersCommand
             {
                 OrderIds = orderIds,
-                Email = model.Email
             });
 
             return Ok(response);
@@ -150,6 +156,47 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             }
 
             return BadRequest("Order not found or already completed.");
+        }
+
+        public class VerifyEmailModel
+        {
+            public string Email { get; set; }
+        }
+
+        [HttpPost("completed/verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailModel model)
+        {
+            var response = await _mediator.Send(new VerifyEmailCommand()
+            {
+                Email = model.Email,
+                Reason = VerifyEmailReason.ConpletedOrdersRequest
+            });
+
+            if (response)
+            {
+                return Ok();
+            }
+
+            return BadRequest("Email verification failed.");
+        }
+
+        [HttpPost("completed/cookie")]
+        public async Task<IActionResult> GetCompletedOrdersCookie([FromBody] GetCompletedOrderIdsByCodeVerifiedEmail model)
+        {
+            var orderIds = await _mediator.Send(new GetCompletedOrderIdsByCodeVerifiedEmail
+            {
+                Email = model.Email,
+                Code = model.Code
+            });
+
+            if (!orderIds.IsNullOrEmptyCollection())
+            {
+                var completedCookieValue = string.Join(";", orderIds.Select(id => id.ToString()));
+                _cookieResponseService.AppendToCookieResponse(Response.Cookies, ResponseCookies.PaidOrderId, completedCookieValue, DateTime.UtcNow.AddMinutes(30));
+                return Ok();
+            }
+
+            return NotFound();
         }
     }
 }

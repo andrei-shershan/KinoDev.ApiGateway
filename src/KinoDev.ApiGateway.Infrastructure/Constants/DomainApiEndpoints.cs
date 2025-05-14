@@ -19,6 +19,7 @@
         public class Orders
         {
             public static string CompleteOrder(Guid id) => $"api/orders/{id}/complete"; 
+            public const string GetCompletedOrdersByEmail = $"api/orders/completed/email";
             public const string CreateOrder = "api/orders";
             public const string GetOrderSummary = "api/orders/summary";
             public const string GetOrder = "api/orders";

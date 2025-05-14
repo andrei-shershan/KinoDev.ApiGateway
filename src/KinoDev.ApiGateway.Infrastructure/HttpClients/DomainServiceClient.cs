@@ -35,7 +35,9 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         Task<OrderDto> UpdateOrderEmailAsync(Guid orderId, string email);
 
-        Task<IEnumerable<OrderSummary>> GetCompletedOrdersAsync(IEnumerable<Guid> orderIds, string email);
+        Task<IEnumerable<OrderSummary>> GetCompletedOrdersAsync(IEnumerable<Guid> orderIds);
+
+        Task<IEnumerable<OrderSummary>> GetCompletedOrdersByEmail(string email);
     }
 
     public class CreateOrderDto
@@ -167,10 +169,20 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             return await response.GetResponseAsync<OrderDto>();
         }
 
-        public async Task<IEnumerable<OrderSummary>> GetCompletedOrdersAsync(IEnumerable<Guid> orderIds, string email)
+        public async Task<IEnumerable<OrderSummary>> GetCompletedOrdersAsync(IEnumerable<Guid> orderIds)
         {
             var requestUri = DomainApiEndpoints.Orders.GetCompletedOrders;
-            var requestContent = new StringContent(JsonConvert.SerializeObject(new { orderIds, email }), Encoding.UTF8, "application/json");
+            var requestContent = new StringContent(JsonConvert.SerializeObject(new { orderIds }), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(requestUri, requestContent);
+
+            return await response.GetResponseAsync<IEnumerable<OrderSummary>>();
+        }
+
+        public async Task<IEnumerable<OrderSummary>> GetCompletedOrdersByEmail(string email)
+        {
+            var requestUri = DomainApiEndpoints.Orders.GetCompletedOrdersByEmail;
+            var requestContent = new StringContent(JsonConvert.SerializeObject(new { email }), Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(requestUri, requestContent);
 
