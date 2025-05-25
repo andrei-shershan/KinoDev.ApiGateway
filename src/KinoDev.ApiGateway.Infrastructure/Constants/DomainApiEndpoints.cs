@@ -6,6 +6,10 @@
         {
             public const string GetMovies = "api/movies";
 
+            public const string CreateMovies = "api/movies";
+
+            public static string GetMovieById(int id) => $"api/movies/{id}";
+
             public const string GetShowingMovies = "api/movies/showing";
         }
 

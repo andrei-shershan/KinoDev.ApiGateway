@@ -95,6 +95,14 @@ namespace KinoDev.ApiGateway.WebApi
                 .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors))
                 .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
 
+            builder.Services
+                .AddHttpClient<IStorageServiceClient, StorageServiceClient>(options =>
+                {
+                    options.BaseAddress = new Uri(apiClients.StorageServiceUri);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors));
+                // .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
+
             builder.Services.AddMemoryCache();
 
             var app = builder.Build();

@@ -1,10 +1,11 @@
-﻿using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies;
+﻿using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Movies;
+using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies;
 using KinoDev.Shared.Constants;
+using KinoDev.Shared.DtoModels.Movies;
 using KinoDev.Shared.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching;
 
 namespace KinoDev.ApiGateway.WebApi.Controllers
 {
@@ -16,8 +17,11 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
     {
         private readonly IMediator _mediator;
 
-        public MoviesController(IMediator mediator)
+        private readonly ILogger<MoviesController> _logger;
+
+        public MoviesController(ILogger<MoviesController> logger, IMediator mediator)
         {
+            _logger = logger;
             _mediator = mediator;
         }
 
@@ -25,13 +29,44 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         public async Task<IActionResult> GetMoviesAsync()
         {
             var response = await _mediator.Send(new GetMoviesQuery());
-
             if (response.IsNullOrEmptyCollection())
             {
                 return NotFound();
             }
 
             return Ok(response);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetMovieByIdAsync([FromRoute] int id)
+        {
+            var response = await _mediator.Send(new GetMovieByIdQuery()
+            {
+                Id = id
+            });
+
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateMovieAsync()
+        {
+            var response = await _mediator.Send(new CreateMovieCommand()
+            {
+                Form = Request.Form,
+            });
+
+            if (response == null)
+            {
+                return BadRequest("Failed to create movie.");
+            }
+
+            return CreatedAtAction(null, null, response);
         }
 
         [HttpGet("showing")]
@@ -47,7 +82,6 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             if (response.IsNullOrEmptyCollection())
             {
                 return NotFound();
-
             }
 
             return Ok(response);

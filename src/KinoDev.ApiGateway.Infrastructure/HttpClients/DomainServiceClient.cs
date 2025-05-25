@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.Extensions;
-using KinoDev.Shared.DtoModels;
 using KinoDev.Shared.DtoModels.Movies;
 using KinoDev.Shared.DtoModels.Orders;
 using KinoDev.Shared.DtoModels.ShowingMovies;
@@ -14,6 +13,10 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
     public interface IDomainServiceClient
     {
         Task<IEnumerable<MovieDto>> GetMoviesAsync();
+
+        Task<MovieDto> GetMovieByIdAsync(int id);
+
+        Task<MovieDto> CreateMovieAsync(MovieDto movieDto);
 
         Task<IEnumerable<ShowingMovie>> GetShowingMoviesAsync(DateTime date);
 
@@ -187,6 +190,31 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             var response = await _httpClient.PostAsync(requestUri, requestContent);
 
             return await response.GetResponseAsync<IEnumerable<OrderSummary>>();
+        }
+
+        public async Task<MovieDto> GetMovieByIdAsync(int id)
+        {
+            var requestUri = $"{DomainApiEndpoints.Movies.GetMovieById(id)}";
+            var response = await _httpClient.GetAsync(requestUri);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.GetResponseAsync<MovieDto>();
+            }
+
+            return null;
+        }
+
+        public async Task<MovieDto> CreateMovieAsync(MovieDto movieDto)
+        {
+            var requestContent = new StringContent(JsonConvert.SerializeObject(movieDto), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(DomainApiEndpoints.Movies.CreateMovies, requestContent);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.GetResponseAsync<MovieDto>();
+            }
+
+            return null;
         }
     }
 }
