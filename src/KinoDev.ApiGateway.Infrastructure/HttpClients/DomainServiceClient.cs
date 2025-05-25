@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.Extensions;
+using KinoDev.Shared.DtoModels.Hall;
 using KinoDev.Shared.DtoModels.Movies;
 using KinoDev.Shared.DtoModels.Orders;
 using KinoDev.Shared.DtoModels.ShowingMovies;
@@ -41,6 +42,12 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
         Task<IEnumerable<OrderSummary>> GetCompletedOrdersAsync(IEnumerable<Guid> orderIds);
 
         Task<IEnumerable<OrderSummary>> GetCompletedOrdersByEmail(string email);
+
+        Task<HallDto> CreateHallAsync(HallDto hallDto);
+
+        Task<HallDto> GetHallByIdAsync(int id);
+        
+        Task<IEnumerable<HallDto>> GetHallsAsync();
     }
 
     public class CreateOrderDto
@@ -212,6 +219,41 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             if (response.IsSuccessStatusCode)
             {
                 return await response.GetResponseAsync<MovieDto>();
+            }
+
+            return null;
+        }
+
+        public async Task<HallDto> CreateHallAsync(HallDto hallDto)
+        {
+            var requestContent = new StringContent(JsonConvert.SerializeObject(hallDto), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(DomainApiEndpoints.Halls.ApiHalls, requestContent);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.GetResponseAsync<HallDto>();
+            }
+
+            return null;
+        }
+
+        public async Task<HallDto> GetHallByIdAsync(int id)
+        {
+            var response = await _httpClient.GetAsync($"{DomainApiEndpoints.Halls.ApiHalls}/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.GetResponseAsync<HallDto>();
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<HallDto>> GetHallsAsync()
+        {
+            var response = await _httpClient.GetAsync(DomainApiEndpoints.Halls.ApiHalls);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.GetResponseAsync<IEnumerable<HallDto>>();
             }
 
             return null;
