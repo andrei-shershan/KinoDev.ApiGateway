@@ -6,7 +6,11 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Halls
 {
     public class CreateHallCommand : IRequest<HallDto>
     {
-        public HallDto Hall { get; set; }
+        public string Name { get; set; }
+
+        public int RowsCount { get; set; }
+
+        public int SeatsCount { get; set; }
     }
 
     public class CreateHallCommandHandler : IRequestHandler<CreateHallCommand, HallDto>
@@ -20,12 +24,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Halls
 
         public async Task<HallDto> Handle(CreateHallCommand request, CancellationToken cancellationToken)
         {
-            if (request.Hall == null)
-            {
-                throw new ArgumentNullException(nameof(request.Hall), "Hall data is required.");
-            }
-
-            return await _domainServiceClient.CreateHallAsync(request.Hall);
+            return await _domainServiceClient.CreateHallAsync(request.Name, request.RowsCount, request.SeatsCount);
         }
     }
 }

@@ -38,14 +38,18 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateHallAsync([FromBody] HallDto hallDto)
+        public async Task<IActionResult> CreateHallAsync([FromBody] CreateHallCommand request)
         {
-            if (hallDto == null)
+            if (request == null)
             {
-                return BadRequest("Hall data is required.");
+                return BadRequest("Request cannot be null.");
             }
 
-            var createdHall = await _mediator.Send(new CreateHallCommand { Hall = hallDto });
+            var createdHall = await _mediator.Send(request);
+            if (createdHall == null)
+            {
+                return BadRequest("Failed to create hall.");
+            }
             return CreatedAtAction(null, null, createdHall);
         }
     }

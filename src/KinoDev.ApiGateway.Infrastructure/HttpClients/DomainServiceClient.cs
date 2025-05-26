@@ -43,11 +43,11 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         Task<IEnumerable<OrderSummary>> GetCompletedOrdersByEmail(string email);
 
-        Task<HallDto> CreateHallAsync(HallDto hallDto);
+        Task<HallSummary> CreateHallAsync(string hallName, int rowsCount, int seatsCount);
 
-        Task<HallDto> GetHallByIdAsync(int id);
-        
-        Task<IEnumerable<HallDto>> GetHallsAsync();
+        Task<HallSummary> GetHallByIdAsync(int id);
+
+        Task<IEnumerable<HallSummary>> GetHallsAsync();
     }
 
     public class CreateOrderDto
@@ -224,36 +224,43 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             return null;
         }
 
-        public async Task<HallDto> CreateHallAsync(HallDto hallDto)
+        public async Task<HallSummary> CreateHallAsync(string hallName, int rowsCount, int seatsCount)
         {
-            var requestContent = new StringContent(JsonConvert.SerializeObject(hallDto), Encoding.UTF8, "application/json");
+            var data = new
+            {
+                Name = hallName,
+                RowsCount = rowsCount,
+                SeatsCount = seatsCount
+            };
+
+            var requestContent = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(DomainApiEndpoints.Halls.ApiHalls, requestContent);
             if (response.IsSuccessStatusCode)
             {
-                return await response.GetResponseAsync<HallDto>();
+                return await response.GetResponseAsync<HallSummary>();
             }
 
             return null;
         }
 
-        public async Task<HallDto> GetHallByIdAsync(int id)
+        public async Task<HallSummary> GetHallByIdAsync(int id)
         {
             var response = await _httpClient.GetAsync($"{DomainApiEndpoints.Halls.ApiHalls}/{id}");
             if (response.IsSuccessStatusCode)
             {
-                return await response.GetResponseAsync<HallDto>();
+                return await response.GetResponseAsync<HallSummary>();
             }
 
             return null;
         }
 
-        public async Task<IEnumerable<HallDto>> GetHallsAsync()
+        public async Task<IEnumerable<HallSummary>> GetHallsAsync()
         {
             var response = await _httpClient.GetAsync(DomainApiEndpoints.Halls.ApiHalls);
             if (response.IsSuccessStatusCode)
             {
-                return await response.GetResponseAsync<IEnumerable<HallDto>>();
+                return await response.GetResponseAsync<IEnumerable<HallSummary>>();
             }
 
             return null;
