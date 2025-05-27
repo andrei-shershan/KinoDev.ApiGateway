@@ -21,6 +21,8 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         Task<IEnumerable<ShowingMovie>> GetShowingMoviesAsync(DateTime date);
 
+        Task<IEnumerable<ShowTimeDetailsDto>> GetShowTimeDetailsAsync(DateTime startDate, DateTime endDate);
+
         Task<ShowTimeDetailsDto> GetShowTimeDetailsAsync(int showTimeId);
 
         Task<ShowTimeSeatsDto> GetShowTimeSeatsAsync(int showTimeId);
@@ -261,6 +263,19 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             if (response.IsSuccessStatusCode)
             {
                 return await response.GetResponseAsync<IEnumerable<HallSummary>>();
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<ShowTimeDetailsDto>> GetShowTimeDetailsAsync(DateTime startDate, DateTime endDate)
+        {
+            var requestUri = $"{DomainApiEndpoints.ShowTimes.GetShowTimes}/{startDate:yyyy-MM-ddTHH:mm:ss}/{endDate:yyyy-MM-ddTHH:mm:ss}";
+
+            var response = await _httpClient.GetAsync(requestUri);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.GetResponseAsync<IEnumerable<ShowTimeDetailsDto>>();
             }
 
             return null;

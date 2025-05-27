@@ -35,6 +35,28 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                 return NotFound();
             }
 
+            [HttpGet("{startDate:datetime}/{endDate:datetime}")]
+            public async Task<IActionResult> GetShowTimesByDateAsync([FromRoute] DateTime startDate, [FromRoute] DateTime endDate)
+            {
+                if (startDate > endDate)
+                {
+                    return BadRequest("Start date cannot be later than end date.");
+                }
+
+                var response = await _mediator.Send(new GetShowTimesByDateQuery()
+                {
+                    StartDate = startDate,
+                    EndDate = endDate
+                });
+
+                if (response == null ||! response.Any())
+                {
+                    return NotFound("No show times found for the specified date range.");
+                }
+
+                return Ok(response);
+            }
+
             [HttpGet("seats/{id}")]
             public async Task<IActionResult> GetSeatsAsync([FromRoute] int id)
             {
