@@ -18,6 +18,13 @@
             public const string GetShowTimeDetails = "api/showtimes/details";
 
             public const string GetShowTimeSeats = "api/showtimes/seats";
+            
+            public const string GetShowTimes = "api/showtimes";
+        }
+
+        public class Slots
+        {
+            public const string GetSlots = "api/slots";            
         }
 
         public class Orders
