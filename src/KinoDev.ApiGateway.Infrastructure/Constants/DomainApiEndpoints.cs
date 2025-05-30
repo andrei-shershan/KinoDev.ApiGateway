@@ -22,6 +22,11 @@
             public const string GetShowTimes = "api/showtimes";
         }
 
+        public class Slots
+        {
+            public const string GetSlots = "api/slots";            
+        }
+
         public class Orders
         {
             public static string CompleteOrder(Guid id) => $"api/orders/{id}/complete";

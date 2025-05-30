@@ -50,6 +50,10 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
         Task<HallSummary> GetHallByIdAsync(int id);
 
         Task<IEnumerable<HallSummary>> GetHallsAsync();
+
+        Task<ShowTimeForDateDto> GetShowTimeForDateDtoAsync(DateTime date);
+
+        Task<bool> CreateShowTimeAsync(int movieId, int hallId, DateTime time, decimal price);
     }
 
     public class CreateOrderDto
@@ -279,6 +283,34 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             }
 
             return null;
+        }
+
+        public async Task<ShowTimeForDateDto> GetShowTimeForDateDtoAsync(DateTime date)
+        {
+            var requestUri = $"{DomainApiEndpoints.Slots.GetSlots}/{date:yyyy-MM-dd}";
+            var response = await _httpClient.GetAsync(requestUri);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.GetResponseAsync<ShowTimeForDateDto>();
+            }
+
+            return null;
+        }
+
+        public async Task<bool> CreateShowTimeAsync(int movieId, int hallId, DateTime time, decimal price)
+        {
+            var requestUri = DomainApiEndpoints.ShowTimes.GetShowTimes;
+            var requestContent = new StringContent(JsonConvert.SerializeObject(new
+            {
+                MovieId = movieId,
+                HallId = hallId,
+                Time = time,
+                Price = price
+            }), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(requestUri, requestContent);
+            return response.IsSuccessStatusCode;
         }
     }
 }
