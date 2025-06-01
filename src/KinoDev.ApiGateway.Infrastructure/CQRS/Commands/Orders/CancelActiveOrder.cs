@@ -1,4 +1,5 @@
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using KinoDev.Shared.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
         private readonly ILogger<CancelActiveOrderHandler> _logger;
 
         public CancelActiveOrderHandler(
-            IPaymentClient paymentClient, 
+            IPaymentClient paymentClient,
             IDomainServiceClient domainServiceClient,
             ILogger<CancelActiveOrderHandler> logger)
         {

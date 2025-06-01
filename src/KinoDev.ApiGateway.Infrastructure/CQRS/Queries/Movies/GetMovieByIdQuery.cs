@@ -3,6 +3,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies
     using System.Threading;
     using System.Threading.Tasks;
     using KinoDev.ApiGateway.Infrastructure.HttpClients;
+    using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
     using KinoDev.Shared.DtoModels.Movies;
     using MediatR;
 

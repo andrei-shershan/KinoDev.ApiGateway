@@ -1,16 +1,10 @@
 using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
+using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace KinoDev.ApiGateway.Infrastructure.Services
 {
-    public interface ICookieResponseService
-    {
-        void AppendToCookieResponse(IResponseCookies cookies, string key, string value, DateTime expiresAt);
-
-        void ResetCookie(IResponseCookies cookies, string key, string value);
-    }
-
     public class CookieResponseService : ICookieResponseService
     {
         private readonly CookieResponseSettings _cookieResponseSettings;

@@ -1,4 +1,5 @@
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using KinoDev.Shared.DtoModels.Hall;
 using MediatR;
 
@@ -6,8 +7,8 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Halls
 {
     public class CreateHallCommand : IRequest<HallDto>
     {
-        public string Name { get; set; }
-
+        public string Name { get; set; } = null!;
+        
         public int RowsCount { get; set; }
 
         public int SeatsCount { get; set; }

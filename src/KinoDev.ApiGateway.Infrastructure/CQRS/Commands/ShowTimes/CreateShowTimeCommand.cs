@@ -1,4 +1,5 @@
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using MediatR;
 
 namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.ShowTimes

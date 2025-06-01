@@ -1,21 +1,21 @@
 namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 {
-    using KinoDev.ApiGateway.Infrastructure.HttpClients;
+    using KinoDev.ApiGateway.Infrastructure.Constants;
+    using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
     using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
-    using KinoDev.ApiGateway.Infrastructure.Services;
     using KinoDev.Shared.DtoModels.Orders;
     using KinoDev.Shared.Services;
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
 
-    public class CompleteOrderCommand : IRequest<OrderDto>
+    public class CompleteOrderCommand : IRequest<OrderDto?>
     {
         public Guid OrderId { get; set; }
-        public string PaymentIntentId { get; set; }
+        public string PaymentIntentId { get; set; } = null!;
     }
 
-    public class CompleteOrderCommandHandler : IRequestHandler<CompleteOrderCommand, OrderDto>
+    public class CompleteOrderCommandHandler : IRequestHandler<CompleteOrderCommand, OrderDto?>
     {
         private readonly IDomainServiceClient _domainServiceClient;
         private readonly IPaymentClient _paymentClient;
@@ -38,7 +38,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
             _messageBrokerSettings = messageBrokerOptions.Value;
         }
 
-        public async Task<OrderDto> Handle(CompleteOrderCommand request, CancellationToken cancellationToken)
+        public async Task<OrderDto?> Handle(CompleteOrderCommand request, CancellationToken cancellationToken)
         {
             var paymentIntentTask = _paymentClient.GetPaymentIntentAsync(request.PaymentIntentId);
             var orderTask = _domainServiceClient.GetOrderAsync(request.OrderId);
@@ -61,14 +61,14 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
                 return null;
             }
 
-            if (!paymentIntent.Metadata.ContainsKey("orderId"))
+            if (!paymentIntent.Metadata.ContainsKey(MetadataConstants.OrderId))
             {
                 _logger.LogError("PaymentIntent does not contain orderId in metadata. PaymentIntentId: {PaymentIntentId}", request.PaymentIntentId);
                 return null;
             }
 
             // TODO Move to constants
-            if (paymentIntent.Metadata["orderId"] != order.Id.ToString())
+            if (paymentIntent.Metadata[MetadataConstants.OrderId] != order.Id.ToString())
             {
                 _logger.LogError("PaymentIntent orderId does not match the order. PaymentIntentId: {PaymentIntentId}, OrderId: {OrderId}", request.PaymentIntentId, request.OrderId);
                 return null;
@@ -82,7 +82,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
                 try
                 {
                     var orderSummary = await _domainServiceClient.GetOrderSummaryAsync(completedOrder.Id);
-                    // Publish order completed event to RabbitMQ
+                    
                     await _messageBrokerService.PublishAsync(
                         orderSummary,
                         _messageBrokerSettings.Topics.OrderCompleted

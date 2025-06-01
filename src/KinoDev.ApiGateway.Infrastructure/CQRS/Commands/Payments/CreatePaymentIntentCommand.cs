@@ -1,15 +1,17 @@
+using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using MediatR;
 
 namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Payments
 {
-    public class CreatePaymentIntentCommand : IRequest<string>
+    public class CreatePaymentIntentCommand : IRequest<string?>
     {
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
         public Guid OrderId { get; set; }
     }
 
-    public class CreatePaymentIntentCommandHandler : IRequestHandler<CreatePaymentIntentCommand, string>
+    public class CreatePaymentIntentCommandHandler : IRequestHandler<CreatePaymentIntentCommand, string?>
     {
         private readonly IPaymentClient _paymentClient;
         private readonly IDomainServiceClient _domainServiceClient;
@@ -20,25 +22,27 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Payments
             _domainServiceClient = domainServiceClient;
         }
 
-        public async Task<string> Handle(CreatePaymentIntentCommand request, CancellationToken cancellationToken)
+        public async Task<string?> Handle(CreatePaymentIntentCommand request, CancellationToken cancellationToken)
         {
             var updatedOrder = await _domainServiceClient.UpdateOrderEmailAsync(request.OrderId, request.Email);
             if (updatedOrder == null)
             {
+                System.Console.WriteLine("Failed to update order email.");
                 return null;
             }
 
             var orderSummary = await _domainServiceClient.GetOrderSummaryAsync(request.OrderId);
             if (orderSummary == null || orderSummary.State != Shared.Enums.OrderState.New)
             {
+                System.Console.WriteLine("Order not found or not in a valid state for payment.");
                 return null;
-            }            
+            }
 
             var metadata = new Dictionary<string, string>();
 
             // TODO: Move to SHARED constants
-            metadata["orderId"] = orderSummary.Id.ToString();
-            metadata["movie"] = orderSummary.ShowTimeSummary.Movie.Name;
+            metadata[MetadataConstants.OrderId] = orderSummary.Id.ToString();
+            metadata[MetadataConstants.Movie] = orderSummary.ShowTimeSummary.Movie.Name;
 
             foreach (var ticket in orderSummary.Tickets)
             {
@@ -48,7 +52,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Payments
             return await _paymentClient.CreatePaymentIntentAsync(
                 request.OrderId,
                 orderSummary.Cost,
-                "usd",
+                "usd", // TODO: Move to SHARED constants
                 metadata
                 );
         }

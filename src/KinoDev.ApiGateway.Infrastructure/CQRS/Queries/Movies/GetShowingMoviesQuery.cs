@@ -1,4 +1,5 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using KinoDev.Shared.DtoModels.ShowingMovies;
 using MediatR;
 
@@ -8,6 +9,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies
     {
         public DateTime Date { get; set; }
     }
+    
     public class GetShowingMoviesQueryHandler : IRequestHandler<GetShowingMoviesQuery, IEnumerable<ShowingMovie>>
     {
         private readonly IDomainServiceClient _domainServiceClient;

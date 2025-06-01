@@ -1,46 +1,21 @@
-using System.Collections;
 using System.Text;
 using KinoDev.ApiGateway.Infrastructure.Constants;
-using KinoDev.ApiGateway.Infrastructure.Extensions;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
+using KinoDev.ApiGateway.Infrastructure.Models.Payments;
+using KinoDev.Shared.Extensions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 {
-    // TODO: Move to Shared project
-    // TOOD: Use models from shared project
-    public enum PaymentProvider
-    {
-        Stripe
-    }
-
-    public class GenericPaymentIntent
-    {
-        public string PaymentIntentId { get; set; }
-        public string ClientSecret { get; set; }
-        public decimal Amount { get; set; }
-        public string Currency { get; set; }
-        public Dictionary<string, string> Metadata { get; set; }
-
-        public string State { get; set; }
-
-        public PaymentProvider PaymentProvider { get; set; }
-    }
-
-    public interface IPaymentClient
-    {
-        Task<string> CreatePaymentIntentAsync(Guid orderId, decimal amount, string currency, Dictionary<string, string> metadata);
-        Task<GenericPaymentIntent> GetPaymentIntentAsync(string id);
-        Task<bool> CompletePayment(string paymentIntentId);
-
-        Task<bool> CancelPendingOrderPayments(Guid orderId);
-    }
-
     public class PaymentClient : IPaymentClient
     {
         private readonly HttpClient _httpClient;
+        private readonly ILogger<PaymentClient> _logger;
 
-        public PaymentClient(HttpClient httpClient)
+        public PaymentClient(HttpClient httpClient, ILogger<PaymentClient> logger)   
         {
+            _logger = logger;
             _httpClient = httpClient;
         }
 
@@ -64,18 +39,19 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
         {
             var requestContent = new StringContent(JsonConvert.SerializeObject(new { orderId = orderId.ToString(), amount, currency, metadata }), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(PaymentApiEndpoints.Payments.CreatePaymentIntent, requestContent);
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadAsStringAsync();
-            }
 
-            return await response.GetResponseAsync<string>();
+            System.Console.WriteLine($"CreatePaymentIntentAsync response: {response.StatusCode}");
+            System.Console.WriteLine($"CreatePaymentIntentAsync response content: {await response.Content.ReadAsStringAsync()}");
+            return await response.GetResponseAsync<string>(_logger);
         }
 
         public async Task<GenericPaymentIntent> GetPaymentIntentAsync(string id)
         {
             var requestUri = PaymentApiEndpoints.Payments.GetPaymentIntent(id);
             var response = await _httpClient.GetAsync(requestUri);
+
+            System.Console.WriteLine($"GetPaymentIntentAsync response: {response.StatusCode}");
+            System.Console.WriteLine($"GetPaymentIntentAsync response content: {await response.Content.ReadAsStringAsync()}");
 
             return await response.GetResponseAsync<GenericPaymentIntent>();
         }

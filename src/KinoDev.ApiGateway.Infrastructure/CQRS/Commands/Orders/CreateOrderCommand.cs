@@ -1,4 +1,5 @@
-using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
+using KinoDev.ApiGateway.Infrastructure.Models.RequestModels;
 using KinoDev.Shared.DtoModels.Orders;
 using MediatR;
 
@@ -22,13 +23,12 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 
         public async Task<OrderSummary> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            var createOrderDto = new CreateOrderDto
-            {
-                ShowTimeId = request.ShowTimeId,
-                SelectedSeatIds = request.SelectedSeatIds
-            };
-
-            return await _domainServiceClient.CreateOrderAsync(createOrderDto);
+            return await _domainServiceClient.CreateOrderAsync(
+                new CreateOrderDto
+                {
+                    ShowTimeId = request.ShowTimeId,
+                    SelectedSeatIds = request.SelectedSeatIds
+                });
         }
     }
 }

@@ -3,16 +3,17 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Orders
     using System.Threading;
     using System.Threading.Tasks;
     using KinoDev.ApiGateway.Infrastructure.HttpClients;
+    using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
     using KinoDev.Shared.DtoModels.Orders;
     using MediatR;
     using Microsoft.Extensions.Logging;
 
-    public class GetActiveOrderQuery : IRequest<OrderSummary>
+    public class GetActiveOrderQuery : IRequest<OrderSummary?>
     {
         public Guid OrderId { get; set; }
     }
 
-    public class GetActiveOrderQueryHandler : IRequestHandler<GetActiveOrderQuery, OrderSummary>
+    public class GetActiveOrderQueryHandler : IRequestHandler<GetActiveOrderQuery, OrderSummary?>
     {
         private readonly IDomainServiceClient _domainServiceClient;
         private readonly ILogger<GetActiveOrderQueryHandler> _logger;
@@ -23,7 +24,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Orders
             _logger = logger;
         }
 
-        public async Task<OrderSummary> Handle(GetActiveOrderQuery request, CancellationToken cancellationToken)
+        public async Task<OrderSummary?> Handle(GetActiveOrderQuery request, CancellationToken cancellationToken)
         {
             if (request.OrderId == Guid.Empty)
             {

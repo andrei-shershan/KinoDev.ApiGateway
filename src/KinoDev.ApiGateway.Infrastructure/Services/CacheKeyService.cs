@@ -1,10 +1,8 @@
+using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
+using KinoDev.Shared.Extensions;
+
 namespace KinoDev.ApiGateway.Infrastructure.Services
 {
-    public interface ICacheKeyService
-    {
-        string GetCacheKey(string prefix, params string[] keys);
-    }
-
     public class CacheKeyService : ICacheKeyService
     {
         public string GetCacheKey(string prefix, params string[] keys)
@@ -14,7 +12,7 @@ namespace KinoDev.ApiGateway.Infrastructure.Services
                 throw new ArgumentException("Prefix cannot be null or empty.", nameof(prefix));
             }
 
-            if (keys == null || keys.Length == 0)
+            if (keys.IsNullOrEmptyCollection())
             {
                 throw new ArgumentException("At least one key must be provided.", nameof(keys));
             }

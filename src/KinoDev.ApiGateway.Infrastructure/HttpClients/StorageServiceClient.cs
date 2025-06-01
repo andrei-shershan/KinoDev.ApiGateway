@@ -1,16 +1,11 @@
 using System.Text;
-using KinoDev.ApiGateway.Infrastructure.Extensions;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using KinoDev.ApiGateway.Infrastructure.Models.RequestModels;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 {
-    public interface IStorageServiceClient
-    {
-        Task<string> UploadFileAsync(string fileName, byte[] bytes);
-    }
-
     public class StorageServiceClient : IStorageServiceClient
     {
         private readonly HttpClient _httpClient;

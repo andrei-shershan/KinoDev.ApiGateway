@@ -1,18 +1,18 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Movies;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies;
 using KinoDev.Shared.Constants;
-using KinoDev.Shared.DtoModels.Movies;
 using KinoDev.Shared.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace KinoDev.ApiGateway.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // TODO: Provide read-only access for managers
     [Authorize(Roles = $"{Roles.Admin}")]
-    // [AllowAnonymous]
     public class MoviesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -71,7 +71,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
         [HttpGet("showing")]
         [AllowAnonymous]
-        //[OutputCache(Duration = 60, VaryByQueryKeys = new[] { "date" })]
+        [OutputCache(Duration = 60, VaryByQueryKeys = new[] { "date" })]
         public async Task<IActionResult> GetShowingMoviesAsync([FromQuery] DateTime date)
         {
             var response = await _mediator.Send(new GetShowingMoviesQuery()

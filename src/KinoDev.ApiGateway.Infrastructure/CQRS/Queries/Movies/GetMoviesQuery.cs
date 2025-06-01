@@ -1,7 +1,7 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using KinoDev.Shared.DtoModels.Movies;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies
 {

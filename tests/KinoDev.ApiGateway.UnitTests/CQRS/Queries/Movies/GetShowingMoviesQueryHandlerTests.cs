@@ -1,5 +1,5 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies;
-using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using KinoDev.Shared.DtoModels.ShowingMovies;
 using Moq;
 

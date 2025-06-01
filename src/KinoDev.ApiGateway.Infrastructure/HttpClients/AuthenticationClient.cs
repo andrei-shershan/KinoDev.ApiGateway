@@ -1,4 +1,5 @@
-﻿using KinoDev.ApiGateway.Infrastructure.Models;
+﻿using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
+using KinoDev.ApiGateway.Infrastructure.Models;
 using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -6,11 +7,6 @@ using System.Text;
 
 namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 {
-    public interface IAuthenticationClient
-    {
-        Task<TokenModel> GetClientTokenAsync();
-    }
-
     public class AuthenticationClient : IAuthenticationClient
     {
         private HttpClient _httpClient;
