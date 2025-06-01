@@ -3,8 +3,8 @@ using Microsoft.IdentityModel.Protocols.Configuration;
 using KinoDev.ApiGateway.Infrastructure.Extensions;
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
 using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
-using Serilog;
 using KinoDev.Shared.Models;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 
 namespace KinoDev.ApiGateway.WebApi
 {
@@ -14,27 +14,27 @@ namespace KinoDev.ApiGateway.WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Configure Serilog
-            builder.Host.UseSerilog((context, configuration) => 
-                configuration.ReadFrom.Configuration(context.Configuration));
-
             // Add services to the container.
             builder.Services.AddOutputCache();
 
             builder.Services.AddControllers();
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+
+            var corsAllowedOrigins = builder.Configuration.GetValue<string>("CORSAllowedOrigins");
+            if (string.IsNullOrWhiteSpace(corsAllowedOrigins))
+            {
+                throw new InvalidConfigurationException("CORSAllowedOrigins is not set in the configuration!");
+            }
 
             // CORS
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>
                 {
-
-                    // TODO: Move to ENV/Settings
-                    policy.WithOrigins("https://ui.kinodev.localhost,https://admin-portal.kinodev.localhost,https://localhost:5173,http://localhost:5173".Split(","))
+                    policy.WithOrigins(corsAllowedOrigins.Split(","))
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
@@ -48,9 +48,9 @@ namespace KinoDev.ApiGateway.WebApi
             var rabbitMqSettings = builder.Configuration.GetSection("RabbitMq").Get<RabbitMqSettings>();
             var messageBrokerSettings = builder.Configuration.GetSection("MessageBroker").Get<MessageBrokerSettings>();
             if (
-                authenticationSettings == null 
-                || apiClients == null 
-                || appBuilderSettigns == null 
+                authenticationSettings == null
+                || apiClients == null
+                || appBuilderSettigns == null
                 || cookieResponseSettings == null
                 || rabbitMqSettings == null
                 || messageBrokerSettings == null)
@@ -96,25 +96,37 @@ namespace KinoDev.ApiGateway.WebApi
                 .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
 
             builder.Services
+                .AddHttpClient<IEmailServiceClient, EmailServiceClient>(options =>
+                {
+                    options.BaseAddress = new Uri(apiClients.EmailServiceUri);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors))
+                .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
+
+            builder.Services
                 .AddHttpClient<IStorageServiceClient, StorageServiceClient>(options =>
                 {
                     options.BaseAddress = new Uri(apiClients.StorageServiceUri);
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => HttpClientHandlerFactory.CreateHandler(appBuilderSettigns.IgnoreSslErrors));
-                // .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
+            // .AddHttpMessageHandler<InternalAuthenticationDelegationHandler>();
 
             builder.Services.AddMemoryCache();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            //app.UseHttpsRedirection();
+            var disableHttpsRedirection = builder.Configuration.GetValue<bool>("DisableHttpsRedirection");
+            if (!disableHttpsRedirection)
+            {
+                app.UseHttpsRedirection();
+            }
+
             app.UseRouting();
 
             app.UseCors(); // Ensure CORS middleware is used

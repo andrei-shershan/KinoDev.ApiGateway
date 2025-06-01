@@ -1,6 +1,8 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.Constants;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using KinoDev.ApiGateway.Infrastructure.Models;
 using KinoDev.ApiGateway.Infrastructure.Services;
+using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
 using System.Net.Http.Headers;
 
 namespace KinoDev.ApiGateway.Infrastructure.HttpClients

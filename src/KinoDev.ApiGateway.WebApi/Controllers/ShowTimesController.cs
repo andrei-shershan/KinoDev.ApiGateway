@@ -1,5 +1,6 @@
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.ShowTimes;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.ShowTimes;
+using KinoDev.Shared.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
     {
         [Route("api/[controller]")]
         [ApiController]
+        // TODO: Review authorization
         [AllowAnonymous]
         public class ShowTimesController : ControllerBase
         {
@@ -50,7 +52,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                     EndDate = endDate
                 });
 
-                if (response == null || !response.Any())
+                if (response.IsNullOrEmptyCollection())
                 {
                     return NotFound("No show times found for the specified date range.");
                 }
@@ -109,7 +111,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                 }
 
                 return BadRequest("Failed to create show time.");
-            }            
+            }
         }
     }
 }

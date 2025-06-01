@@ -15,25 +15,29 @@
 
         public class ShowTimes
         {
+            public const string GetShowTimes = "api/showtimes";
+
             public const string GetShowTimeDetails = "api/showtimes/details";
 
             public const string GetShowTimeSeats = "api/showtimes/seats";
-            
-            public const string GetShowTimes = "api/showtimes";
         }
 
         public class Slots
         {
-            public const string GetSlots = "api/slots";            
+            public const string GetSlots = "api/slots";
         }
 
         public class Orders
         {
-            public static string CompleteOrder(Guid id) => $"api/orders/{id}/complete";
-            public const string GetCompletedOrdersByEmail = $"api/orders/completed/email";
-            public const string CreateOrder = "api/orders";
-            public const string GetOrderSummary = "api/orders/summary";
             public const string GetOrder = "api/orders";
+
+            public const string CreateOrder = "api/orders";
+
+            public static string CompleteOrder(Guid id) => $"api/orders/{id}/complete";
+
+            public const string GetCompletedOrdersByEmail = $"api/orders/completed/email";
+            
+            public const string GetOrderSummary = "api/orders/summary";
 
             public const string GetCompletedOrders = "api/orders/completed";
 

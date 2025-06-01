@@ -1,4 +1,5 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.Services;
+using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
 using KinoDev.Shared.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,15 +21,11 @@ namespace KinoDev.ApiGateway.Infrastructure.Extensions
             services.AddMemoryCache();
             services.AddSingleton<ICacheProvider, MemoryCacheProvider>();
 
-            services.AddSerilogServices(configuration);
-
             services.AddTransient<ICookieResponseService, CookieResponseService>();
 
             services.AddSingleton<IMessageBrokerService, RabbitMQService>();
 
             services.AddScoped<ICacheKeyService, CacheKeyService>();
-
-            services.AddHostedService<MessagingSubscriber>();
 
             return services;
         }

@@ -1,5 +1,6 @@
 using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Payments;
+using KinoDev.ApiGateway.WebApi.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // TODO: Review authorization requirements
     // [Authorize]
     [AllowAnonymous]
     public class PaymentsController : ControllerBase
@@ -19,21 +21,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             _mediator = mediator;
         }
 
-        public class CreatePaymentIntentModel
-        {
-            public int Amount { get; set; }
-
-            public string Currency { get; set; }
-
-            public Dictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>();
-        }
-
-        public class CreatePaymentRequest
-        {
-            public string Email { get; set; }
-        }
-
-        [HttpPost("")]
+        [HttpPost]
         public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest model)
         {
             var orderId = Request.Cookies[ResponseCookies.CookieOrderId];
@@ -50,7 +38,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             if (response == null)
             {
-                return BadRequest("HOHO!");
+                return BadRequest("Failed to create payment intent. Please try again later.");
             }
 
             return Ok(new { clientSecret = response });

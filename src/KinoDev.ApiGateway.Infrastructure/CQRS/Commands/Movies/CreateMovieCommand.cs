@@ -1,4 +1,5 @@
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
+using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using KinoDev.Shared.DtoModels.Movies;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -6,12 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Movies
 {
-    public class CreateMovieCommand : IRequest<MovieDto>
+    public class CreateMovieCommand : IRequest<MovieDto?>
     {
-                public IFormCollection Form { get; set; }
+        public IFormCollection Form { get; set; } = null!;
     }
 
-    public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, MovieDto>
+    public class CreateMovieCommandHandler : IRequestHandler<CreateMovieCommand, MovieDto?>
     {
         private readonly IDomainServiceClient _domainServiceClient;
         private readonly IStorageServiceClient _storageServiceClient;
@@ -28,7 +29,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Movies
             _logger = logger;
         }
 
-        public async Task<MovieDto> Handle(CreateMovieCommand request, CancellationToken cancellationToken)
+        public async Task<MovieDto?> Handle(CreateMovieCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -51,6 +52,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Movies
                 byte[] fileBytes = new byte[fileStream.Length];
                 await fileStream.ReadAsync(fileBytes, 0, (int)fileStream.Length);
 
+                // TODO: Implement a more robust file name generation strategy
                 var fileName = Guid.NewGuid().ToString() + request.Form.Files[0].FileName;
 
                 var fileRelativePath = await _storageServiceClient.UploadFileAsync(fileName, fileBytes);

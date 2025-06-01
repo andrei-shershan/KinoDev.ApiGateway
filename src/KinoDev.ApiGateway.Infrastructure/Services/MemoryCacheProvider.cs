@@ -1,13 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace KinoDev.ApiGateway.Infrastructure.Services
 {
-    public interface ICacheProvider
-    {
-        T? Get<T>(string key);
-        void Set<T>(string key, T item, TimeSpan expiration);
-    }
-
     public class MemoryCacheProvider : ICacheProvider
     {
         private readonly IMemoryCache _cache;
@@ -29,6 +24,7 @@ namespace KinoDev.ApiGateway.Infrastructure.Services
             {
                 AbsoluteExpirationRelativeToNow = expiration
             };
+            
             _cache.Set(key, item, options);
         }
     }

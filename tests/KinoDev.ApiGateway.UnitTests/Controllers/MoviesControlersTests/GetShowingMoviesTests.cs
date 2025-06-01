@@ -8,6 +8,23 @@ namespace KinoDev.ApiGateway.UnitTests.Controllers.MoviesControlersTests
     public class GetShowingMoviesTests : MoviesControllerBaseTests
     {
         [Fact]
+        public async Task GetShowingMoviesAsync_PassesCorrectDate_ToMediator()
+        {
+            // Arrange
+            var date = new DateTime(2023, 10, 15);
+            
+            _mediatorMock.Setup(m => m.Send(It.Is<GetShowingMoviesQuery>(q => q.Date == date), default))
+                         .ReturnsAsync(new List<ShowingMovie>())
+                         .Verifiable();
+
+            // Act
+            await _controller.GetShowingMoviesAsync(date);
+
+            // Assert
+            _mediatorMock.Verify(m => m.Send(It.Is<GetShowingMoviesQuery>(q => q.Date == date), default), Times.Once);
+        }
+
+        [Fact]
         public async Task GetShowingMoviesAsync_ReturnsOk_WhenMoviesExist()
         {
             // Arrange

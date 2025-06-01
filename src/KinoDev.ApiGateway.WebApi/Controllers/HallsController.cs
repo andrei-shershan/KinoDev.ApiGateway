@@ -1,6 +1,7 @@
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Halls;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Halls;
-using KinoDev.Shared.DtoModels.Hall;
+using KinoDev.Shared.Constants;
+using KinoDev.Shared.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,8 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    // TODO: Provide read-only access for managers
+    [Authorize(Roles = $"{Roles.Admin}")]
     public class HallsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -22,6 +25,11 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         public async Task<IActionResult> GetHallsAsync()
         {
             var halls = await _mediator.Send(new GetHallsQuery());
+            if (halls.IsNullOrEmptyCollection())
+            {
+                return NotFound("No halls found.");
+            }
+
             return Ok(halls);
         }
 
@@ -50,6 +58,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             {
                 return BadRequest("Failed to create hall.");
             }
+
             return CreatedAtAction(null, null, createdHall);
         }
     }

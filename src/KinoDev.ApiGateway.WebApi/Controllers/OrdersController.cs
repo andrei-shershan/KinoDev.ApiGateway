@@ -3,7 +3,7 @@ using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Emails;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Orders;
 using KinoDev.ApiGateway.Infrastructure.Models.Enums;
-using KinoDev.ApiGateway.Infrastructure.Services;
+using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
 using KinoDev.ApiGateway.WebApi.Models;
 using KinoDev.Shared.Extensions;
 using MediatR;
@@ -16,6 +16,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     // [Authorize]
+    // TODO: Review authorization
     [AllowAnonymous]
     public class OrdersController : ControllerBase
     {
@@ -53,7 +54,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             return Ok(response);
         }
 
-        [HttpPost("")]
+        [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderModel model)
         {
             var response = await _mediator.Send(new CreateOrderCommand()
@@ -81,6 +82,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                 return Ok(Array.Empty<Guid>());
             }
 
+            // TODO: Use a more robust parsing method
             var orderIds = paidOrdersCookie
                 .Split(new[] { ";", "%3B" }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(id => Guid.Parse(id));
@@ -89,6 +91,11 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             {
                 OrderIds = orderIds,
             });
+
+            if (response.IsNullOrEmptyCollection())
+            {
+                return NotFound();
+            }
 
             return Ok(response);
         }
@@ -156,11 +163,6 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             }
 
             return BadRequest("Order not found or already completed.");
-        }
-
-        public class VerifyEmailModel
-        {
-            public string Email { get; set; }
         }
 
         [HttpPost("completed/verify-email")]
