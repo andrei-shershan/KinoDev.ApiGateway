@@ -5,6 +5,7 @@ using KinoDev.ApiGateway.Infrastructure.HttpClients;
 using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
 using KinoDev.Shared.Models;
 using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
+using KinoDev.ApiGateway.WebApi.Models;
 
 namespace KinoDev.ApiGateway.WebApi
 {
@@ -47,24 +48,24 @@ namespace KinoDev.ApiGateway.WebApi
             var cookieResponseSettings = builder.Configuration.GetSection("CookieResponse").Get<CookieResponseSettings>();
             var rabbitMqSettings = builder.Configuration.GetSection("RabbitMq").Get<RabbitMqSettings>();
             var messageBrokerSettings = builder.Configuration.GetSection("MessageBroker").Get<MessageBrokerSettings>();
+            var portalSettings = builder.Configuration.GetSection("PortalSettings").Get<PortalSettings>();
             if (
                 authenticationSettings == null
                 || apiClients == null
                 || appBuilderSettigns == null
                 || cookieResponseSettings == null
                 || rabbitMqSettings == null
-                || messageBrokerSettings == null)
+                || messageBrokerSettings == null
+                || portalSettings == null)
             {
                 throw new InvalidConfigurationException("Cannot obtain from settings!");
             }
 
             builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSection("Authentication"));
-
             builder.Services.Configure<CookieResponseSettings>(builder.Configuration.GetSection("CookieResponse"));
-
             builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMq"));
-
             builder.Services.Configure<MessageBrokerSettings>(builder.Configuration.GetSection("MessageBroker"));
+            builder.Services.Configure<PortalSettings>(builder.Configuration.GetSection("PortalSettings"));
 
             builder.Services.SetupAuthentication(authenticationSettings);
 
