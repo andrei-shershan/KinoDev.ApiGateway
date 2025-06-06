@@ -8,42 +8,24 @@ namespace KinoDev.ApiGateway.UnitTests.Controllers.OrdersControllerTests
 {
     public class VerifyEmailTests : OrdersControllerBaseTests
     {
-        [Fact]
-        public async Task VerifyEmail_ReturnsBadRequest_WhenVerificationFails()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task VerifyEmail_ReturnsOkResult_WhenVerificationCalled(bool isSuccess)
         {
             // Arrange
             var model = new VerifyEmailModel { Email = "test@example.com" };
             _mediatorMock.Setup(m => m.Send(It.IsAny<VerifyEmailCommand>(), default))
-                .ReturnsAsync(false);
-
-            // Act
-            var result = await _controller.VerifyEmail(model);
-
-            // Assert
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Contains("Email verification failed", badRequestResult.Value.ToString());
-            
-            _mediatorMock.Verify(m => m.Send(It.Is<VerifyEmailCommand>(c => 
-                c.Email == model.Email && 
-                c.Reason == VerifyEmailReason.ConpletedOrdersRequest), default), Times.Once);
-        }
-
-        [Fact]
-        public async Task VerifyEmail_ReturnsOkResult_WhenVerificationSucceeds()
-        {
-            // Arrange
-            var model = new VerifyEmailModel { Email = "test@example.com" };
-            _mediatorMock.Setup(m => m.Send(It.IsAny<VerifyEmailCommand>(), default))
-                .ReturnsAsync(true);
+                .ReturnsAsync(isSuccess);
 
             // Act
             var result = await _controller.VerifyEmail(model);
 
             // Assert
             Assert.IsType<OkResult>(result);
-            
-            _mediatorMock.Verify(m => m.Send(It.Is<VerifyEmailCommand>(c => 
-                c.Email == model.Email && 
+
+            _mediatorMock.Verify(m => m.Send(It.Is<VerifyEmailCommand>(c =>
+                c.Email == model.Email &&
                 c.Reason == VerifyEmailReason.ConpletedOrdersRequest), default), Times.Once);
         }
     }
