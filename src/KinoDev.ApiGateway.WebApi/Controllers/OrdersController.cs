@@ -168,18 +168,14 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         [HttpPost("completed/verify-email")]
         public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailModel model)
         {
-            var response = await _mediator.Send(new VerifyEmailCommand()
+            _ = await _mediator.Send(new VerifyEmailCommand()
             {
                 Email = model.Email,
                 Reason = VerifyEmailReason.ConpletedOrdersRequest
             });
 
-            if (response)
-            {
-                return Ok();
-            }
-
-            return BadRequest("Email verification failed.");
+            // We always return Ok here
+            return Ok();
         }
 
         [HttpPost("completed/cookie")]
