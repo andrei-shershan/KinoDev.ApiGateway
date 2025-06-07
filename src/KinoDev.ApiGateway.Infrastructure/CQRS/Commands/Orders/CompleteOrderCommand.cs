@@ -1,10 +1,11 @@
 namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 {
+    using System.Text;
     using KinoDev.ApiGateway.Infrastructure.Constants;
     using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
     using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
     using KinoDev.Shared.DtoModels.Orders;
-    using KinoDev.Shared.Services;
+    using KinoDev.Shared.Services.Abstractions;
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
@@ -79,22 +80,12 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
             var completedOrder = await _domainServiceClient.CompleteOrderAsync(request.OrderId);
             if (completedOrder != null)
             {
-                try
-                {
-                    var orderSummary = await _domainServiceClient.GetOrderSummaryAsync(completedOrder.Id);
-                    
-                    await _messageBrokerService.PublishAsync(
-                        orderSummary,
-                        _messageBrokerSettings.Topics.OrderCompleted
-                    );
+                var orderSummary = await _domainServiceClient.GetOrderSummaryAsync(completedOrder.Id);
 
-                    _logger.LogInformation("Published order completion event for OrderId: {OrderId}", completedOrder.Id);
-                }
-                catch (Exception ex)
-                {
-                    // Log but don't fail the operation if message publishing fails
-                    _logger.LogError(ex, "Failed to publish order completion event for OrderId: {OrderId}", completedOrder.Id);
-                }
+                await _messageBrokerService.SendMessageAsync(
+                    _messageBrokerSettings.Queues.OrderCompleted,
+                    orderSummary
+                );
             }
 
             return completedOrder;
