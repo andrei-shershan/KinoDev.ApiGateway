@@ -2,10 +2,10 @@ namespace KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings
 {
     public class MessageBrokerSettings
     {
-        public Topics Topics { get; set; }
+        public Queues Queues { get; set; }
     }
 
-    public class Topics
+    public class Queues
     {
         public string OrderCompleted { get; set; }
     }

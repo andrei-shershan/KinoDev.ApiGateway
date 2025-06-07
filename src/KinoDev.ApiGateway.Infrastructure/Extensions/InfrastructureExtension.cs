@@ -1,6 +1,7 @@
 ﻿using KinoDev.ApiGateway.Infrastructure.Services;
 using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
 using KinoDev.Shared.Services;
+using KinoDev.Shared.Services.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
