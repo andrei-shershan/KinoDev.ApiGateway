@@ -32,7 +32,7 @@ namespace KinoDev.ApiGateway.UnitTests.Controllers.OrdersControllerTests
         }
 
         [Fact]
-        public async Task GetCompletedOrdersCookie_ReturnsNotFound_WhenEmptyOrdersReturned()
+        public async Task GetCompletedOrdersCookie_ReturnsOk_WhenEmptyOrdersReturned()
         {
             // Arrange
             var model = new GetCompletedOrderIdsByCodeVerifiedEmail
@@ -48,7 +48,7 @@ namespace KinoDev.ApiGateway.UnitTests.Controllers.OrdersControllerTests
             var result = await _controller.GetCompletedOrdersCookie(model);
 
             // Assert
-            Assert.IsType<NotFoundResult>(result);
+            Assert.IsType<OkResult>(result);
             
             _mediatorMock.Verify(m => m.Send(It.Is<GetCompletedOrderIdsByCodeVerifiedEmail>(q => 
                 q.Email == model.Email && 

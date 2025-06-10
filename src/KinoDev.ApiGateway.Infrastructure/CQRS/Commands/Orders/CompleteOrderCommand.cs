@@ -82,10 +82,17 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
             {
                 var orderSummary = await _domainServiceClient.GetOrderSummaryAsync(completedOrder.Id);
 
-                await _messageBrokerService.SendMessageAsync(
-                    _messageBrokerSettings.Queues.OrderCompleted,
-                    orderSummary
-                );
+                try
+                {
+                    await _messageBrokerService.SendMessageAsync(
+                        _messageBrokerSettings.Queues.OrderCompleted,
+                        orderSummary
+                    );
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send OrderCompleted message to the message broker. OrderId: {OrderId}", completedOrder.Id);
+                }
             }
 
             return completedOrder;

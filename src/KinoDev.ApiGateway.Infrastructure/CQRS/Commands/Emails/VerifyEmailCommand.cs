@@ -2,7 +2,6 @@ using KinoDev.ApiGateway.Infrastructure.Constants;
 using KinoDev.ApiGateway.Infrastructure.HttpClients;
 using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
 using KinoDev.ApiGateway.Infrastructure.Models.Enums;
-using KinoDev.ApiGateway.Infrastructure.Services;
 using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
 using KinoDev.Shared.Helpers;
 using MediatR;
@@ -53,7 +52,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Emails
                     $"<p>Your verification code is:</p> <h2>{verificationCode}</h2>");
 
                 if (!response)
-                {
+                {   
                     return false; // Email sending failed
                 }
 
