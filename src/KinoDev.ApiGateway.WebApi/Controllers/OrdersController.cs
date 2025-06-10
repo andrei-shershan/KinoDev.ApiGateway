@@ -187,7 +187,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                 Code = model.Code
             });
 
-            if (!orderIds.IsNullOrEmptyCollection())
+            if (orderIds != null)
             {
                 var completedCookieValue = string.Join(";", orderIds.Select(id => id.ToString()));
                 _cookieResponseService.AppendToCookieResponse(Response.Cookies, ResponseCookies.PaidOrderId, completedCookieValue, DateTime.UtcNow.AddMinutes(30));

@@ -1,7 +1,5 @@
 using KinoDev.ApiGateway.Infrastructure.Constants;
-using KinoDev.ApiGateway.Infrastructure.HttpClients;
 using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
-using KinoDev.ApiGateway.Infrastructure.Services;
 using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
 using KinoDev.Shared.Extensions;
 using KinoDev.Shared.Helpers;
@@ -45,6 +43,10 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Orders
                 if (!completedOrders.IsNullOrEmptyCollection())
                 {
                     return completedOrders.Select(x => x.Id);
+                }
+                else
+                {
+                    return new List<Guid>();
                 }
             }
 

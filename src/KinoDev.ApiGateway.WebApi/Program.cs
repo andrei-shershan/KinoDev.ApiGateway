@@ -48,22 +48,28 @@ namespace KinoDev.ApiGateway.WebApi
             var cookieResponseSettings = builder.Configuration.GetSection("CookieResponse").Get<CookieResponseSettings>();
             var rabbitMqSettings = builder.Configuration.GetSection("RabbitMq").Get<RabbitMqSettings>();
             var messageBrokerSettings = builder.Configuration.GetSection("MessageBroker").Get<MessageBrokerSettings>();
+            var azureServiceBusSettings = builder.Configuration.GetSection("AzureServiceBus").Get<AzureServiceBusSettings>();
             var portalSettings = builder.Configuration.GetSection("PortalSettings").Get<PortalSettings>();
             if (
                 authenticationSettings == null
                 || apiClients == null
                 || appBuilderSettigns == null
                 || cookieResponseSettings == null
-                || rabbitMqSettings == null
                 || messageBrokerSettings == null
                 || portalSettings == null)
             {
                 throw new InvalidConfigurationException("Cannot obtain from settings!");
             }
 
+            if(rabbitMqSettings == null && azureServiceBusSettings == null)
+            {
+                throw new InvalidConfigurationException("RabbitMqSettings or AzureServiceBusSettings must be set in the configuration!");
+            }
+
             builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSection("Authentication"));
             builder.Services.Configure<CookieResponseSettings>(builder.Configuration.GetSection("CookieResponse"));
             builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMq"));
+            builder.Services.Configure<AzureServiceBusSettings>(builder.Configuration.GetSection("AzureServiceBus"));
             builder.Services.Configure<MessageBrokerSettings>(builder.Configuration.GetSection("MessageBroker"));
             builder.Services.Configure<PortalSettings>(builder.Configuration.GetSection("PortalSettings"));
 

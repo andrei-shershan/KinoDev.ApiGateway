@@ -24,7 +24,19 @@ namespace KinoDev.ApiGateway.Infrastructure.Extensions
 
             services.AddTransient<ICookieResponseService, CookieResponseService>();
 
-            services.AddSingleton<IMessageBrokerService, RabbitMQService>();
+            var messageBrokerName = configuration.GetValue<string>("MessageBrokerName");
+            if (messageBrokerName == "RabbitMQ")
+            {
+                services.AddScoped<IMessageBrokerService, RabbitMQService>();
+            }
+            else if (messageBrokerName == "AzureServiceBus")
+            {
+                services.AddScoped<IMessageBrokerService, AzureServiceBusService>();
+            }
+            else
+            {
+                throw new InvalidOperationException("Invalid MessageBrokerName configuration value.");
+            }
 
             services.AddScoped<ICacheKeyService, CacheKeyService>();
 
