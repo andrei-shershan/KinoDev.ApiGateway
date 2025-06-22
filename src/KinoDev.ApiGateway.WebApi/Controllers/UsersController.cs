@@ -8,7 +8,6 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    [AllowAnonymous]
     public class UsersController : ControllerBase
     {
         // TODO: Review this endpoint
