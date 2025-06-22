@@ -8,7 +8,9 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-# TODO: Move Build and Tests to separate ymll files
+  projectPath: 'src/KinoDev.DomainService.WebApi/KinoDev.DomainService.WebApi.csproj'
+  webAppName: '$(AZURE_WEBAPP_NAME)'
+
 stages:
   - stage: Build_and_Test
     displayName: 'Build_and_Tests'
@@ -38,43 +40,50 @@ stages:
                 -replace '\$env:GITHUB_READ_PACKAGE_TOKEN', $env:GITHUB_READ_PACKAGE_TOKEN | `
                 Set-Content -Path configs/nuget.azure.config
 
-        - task: NuGetCommand@2
+        - task: DotNetCoreCLI@2
           displayName: 'Restore NuGet Packages'
           inputs:
             command: 'restore'
-            restoreSolution: '**/*.sln'
+            projects: '**/*.sln'
             feedsToUse: 'config'
             nugetConfigPath: 'configs/nuget.azure.config'
 
-        - task: VSBuild@1
+        - task: DotNetCoreCLI@2
           displayName: 'Build Solution'
           inputs:
-            solution: '**/*.sln'
-            platform: 'Any CPU'
-            configuration: '$(buildConfiguration)'
+            command: 'build'
+            projects: '**/*.sln'
+            arguments: '--configuration $(buildConfiguration) --no-restore'
 
-        - task: VSTest@3
+        - task: DotNetCoreCLI@2
           displayName: 'Run Unit Tests'
-          inputs:           
-            testSelector: 'testAssemblies'
-            testAssemblyVer2: |
-              **\*UnitTests*.dll
-              !**\*TestAdapter.dll
-              !**\obj\**            
-            codeCoverageEnabled: true
-            searchFolder: '$(System.DefaultWorkingDirectory)'
-
-        - task: PublishTestResults@2
-          displayName: 'Publish Test Results'
           inputs:
-            testResultsFiles: '**/TestResults/*.trx'
-            testRunTitle: 'VSTest Results'
+            command: 'test'
+            projects: '**/*UnitTests/*.csproj'
+            arguments: '--configuration $(buildConfiguration) --no-build --collect:"XPlat Code Coverage"'
+
+        - task: PublishCodeCoverageResults@1
+          displayName: 'Publish Code Coverage Results'
+          inputs:
+            codeCoverageTool: 'Cobertura'
+            summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+
+        - task: DotNetCoreCLI@2
+          displayName: 'Publish Web API Project'
+          inputs:
+            command: 'publish'
+            publishWebProjects: false
+            projects: '$(projectPath)'
+            arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/app'
+            zipAfterPublish: true
+            modifyOutputPath: false
 
         - task: PublishBuildArtifacts@1
-          displayName: 'Publish Build Artifacts'
+          displayName: 'Publish build artifacts'
           inputs:
-            pathToPublish: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'drop'
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/app'
+            ArtifactName: 'app'
+            publishLocation: 'Container'
 
   - stage: Deploy
     displayName: 'Deploy to Azure'
@@ -86,7 +95,7 @@ stages:
       environment: kinodev-live
       strategy:
         runOnce:
-          deploy:    
+          deploy:
             steps:
             - task: DownloadBuildArtifacts@1
               displayName: 'Download build artifacts'
