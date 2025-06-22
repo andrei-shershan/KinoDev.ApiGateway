@@ -8,7 +8,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  projectPath: 'src/KinoDev.DomainService.WebApi/KinoDev.DomainService.WebApi.csproj'
+  projectPath: 'src/KinoDev.ApiGateway.WebApi/KinoDev.ApiGateway.WebApi.csproj'
   webAppName: '$(AZURE_WEBAPP_NAME)'
 
 stages:
