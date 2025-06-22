@@ -15,6 +15,9 @@ namespace KinoDev.ApiGateway.WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Add Application Insights
+            builder.Services.AddApplicationInsightsTelemetry();
+
             // Add services to the container.
             builder.Services.AddOutputCache();
 
