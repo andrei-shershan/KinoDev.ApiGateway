@@ -86,5 +86,13 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 
             return Ok(response);
         }
+
+        [AllowAnonymous]
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            _logger.LogInformation("Test endpoint hit at {Time}", DateTime.UtcNow);
+            return Ok($"Test successful, {DateTime.UtcNow} UTC");
+        }
     }
 }
