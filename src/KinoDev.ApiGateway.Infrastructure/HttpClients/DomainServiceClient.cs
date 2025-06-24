@@ -216,6 +216,8 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             var response = await _httpClient.GetAsync(DomainApiEndpoints.Movies.test);
             var content = await response.Content.ReadAsStringAsync();
 
+            _logger.LogInformation($"Content from test endpoint: {content}");
+
             return response.IsSuccessStatusCode;
         }
 
@@ -223,6 +225,8 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
         {
             var response = await _httpClient.GetAsync(DomainApiEndpoints.Movies.test2);
             var content = await response.Content.ReadAsStringAsync();
+
+            _logger.LogInformation($"Content from test endpoint: {content}");
 
             return response.IsSuccessStatusCode;
         }
