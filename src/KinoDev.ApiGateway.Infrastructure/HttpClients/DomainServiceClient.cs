@@ -9,6 +9,7 @@ using KinoDev.Shared.DtoModels.ShowingMovies;
 using KinoDev.Shared.DtoModels.ShowTimes;
 using KinoDev.Shared.Extensions;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace KinoDev.ApiGateway.Infrastructure.HttpClients
@@ -17,9 +18,13 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
     {
         private readonly HttpClient _httpClient;
 
-        public DomainServiceClient(HttpClient httpClient)
+        private readonly ILogger<DomainServiceClient> _logger;
+
+        public DomainServiceClient(HttpClient httpClient,
+        ILogger<DomainServiceClient> logger)
         {
             _httpClient = httpClient;
+            _logger = logger;
         }
 
         public async Task<OrderDto> CompleteOrderAsync(Guid orderId)
@@ -203,6 +208,22 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             }), Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(requestUri, requestContent);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> Test()
+        {
+            var response = await _httpClient.GetAsync(DomainApiEndpoints.Movies.test);
+            var content = await response.Content.ReadAsStringAsync();
+
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> Test2()
+        {
+            var response = await _httpClient.GetAsync(DomainApiEndpoints.Movies.test2);
+            var content = await response.Content.ReadAsStringAsync();
+
             return response.IsSuccessStatusCode;
         }
     }

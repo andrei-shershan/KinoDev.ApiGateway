@@ -11,6 +11,10 @@
             public static string GetMovieById(int id) => $"api/movies/{id}";
 
             public const string GetShowingMovies = "api/movies/showing";
+
+            public const string test = "api/movies/test";
+
+            public const string test2 = "api/movies/test2";
         }
 
         public class ShowTimes
