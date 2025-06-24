@@ -7,19 +7,21 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Queries.Movies
 
     public class GetTest2Query : IRequest<bool>
     {
-        public class GetTest2QueryHandler : IRequestHandler<GetTestQuery, bool>
+    }
+
+    public class GetTest2QueryHandler : IRequestHandler<GetTest2Query, bool>
+    {
+        private readonly IDomainServiceClient _domainServiceClient;
+
+        public GetTest2QueryHandler(IDomainServiceClient domainServiceClient)
         {
-            private readonly IDomainServiceClient _domainServiceClient;
+            _domainServiceClient = domainServiceClient;
+        }
 
-            public GetTest2QueryHandler(IDomainServiceClient domainServiceClient)
-            {
-                _domainServiceClient = domainServiceClient;
-            }
-
-            public async Task<bool> Handle(GetTestQuery request, CancellationToken cancellationToken)
-            {
-                return await _domainServiceClient.Test2();
-            }
+        public async Task<bool> Handle(GetTest2Query request, CancellationToken cancellationToken)
+        {
+            return await _domainServiceClient.Test2();
         }
     }
+
 }
