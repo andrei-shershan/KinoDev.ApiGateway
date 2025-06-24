@@ -49,5 +49,9 @@ public interface IDomainServiceClient
     Task<ShowTimeForDateDto> GetShowTimeForDateDtoAsync(DateTime date);
 
     Task<bool> CreateShowTimeAsync(int movieId, int hallId, DateTime time, decimal price);
+
+    Task<bool> Test();
+
+    Task<bool> Test2();
 }
 

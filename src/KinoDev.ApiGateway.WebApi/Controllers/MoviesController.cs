@@ -94,5 +94,29 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             _logger.LogInformation("Test endpoint hit at {Time}", DateTime.UtcNow);
             return Ok($"Test successful, {DateTime.UtcNow} UTC");
         }
+
+        [AllowAnonymous]
+        [HttpGet("test-domain")]
+        public async Task<IActionResult> TestDomain()
+        {
+            var response = await _mediator.Send(new GetTestQuery());
+            if (!response)
+            {
+                return BadRequest("Test failed.");
+            }
+            return Ok($"Test successful, {DateTime.UtcNow} UTC");
+        }
+
+        [AllowAnonymous]
+        [HttpGet("test-domain-2")]
+        public async Task<IActionResult> TestDomain2()
+        {
+            var response = await _mediator.Send(new GetTest2Query());
+            if (!response)
+            {
+                return BadRequest("Test failed.");
+            }
+            return Ok($"Test successful, {DateTime.UtcNow} UTC");
+        }
     }
 }
