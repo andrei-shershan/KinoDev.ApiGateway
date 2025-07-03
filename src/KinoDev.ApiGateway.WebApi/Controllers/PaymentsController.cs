@@ -16,15 +16,20 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
     {
         private readonly IMediator _mediator;
 
-        public PaymentsController(IMediator mediator)
+        private readonly ILogger<PaymentsController> _logger;
+
+        public PaymentsController(IMediator mediator,
+            ILogger<PaymentsController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest model)
         {
             var orderId = Request.Cookies[ResponseCookies.CookieOrderId];
+            _logger.LogInformation("Received request to create payment for order ID: {OrderId}", orderId);
             if (orderId == null)
             {
                 return BadRequest();
