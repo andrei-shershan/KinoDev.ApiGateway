@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
-using Microsoft.Extensions.Logging;
 
 namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 {
@@ -21,6 +20,11 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             var response = await _httpClient.PostAsync("api/emails/send", content);
 
             return response.IsSuccessStatusCode;
+        }
+
+        public async Task Up()
+        {
+            await _httpClient.GetAsync("up");
         }
     }
 }

@@ -20,6 +20,11 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
             _logger = logger;
         }
 
+        public async Task Up()
+        {
+            await _httpClient.GetAsync("up");
+        }
+
         public async Task<string> UploadFileAsync(string fileName, byte[] bytes)
         {
             var requestUri = "api/files";

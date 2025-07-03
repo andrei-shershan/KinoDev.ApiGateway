@@ -230,5 +230,11 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
             return response.IsSuccessStatusCode;
         }
+
+        public async Task Up()
+        {
+            var response = await _httpClient.GetAsync("up");
+            _logger.LogInformation($"Response from up endpoint: {response.StatusCode}");
+        }
     }
 }

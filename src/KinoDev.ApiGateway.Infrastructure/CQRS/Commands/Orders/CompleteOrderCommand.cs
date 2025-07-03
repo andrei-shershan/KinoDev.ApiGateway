@@ -4,6 +4,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
     using KinoDev.ApiGateway.Infrastructure.Constants;
     using KinoDev.ApiGateway.Infrastructure.HttpClients.Abstractions;
     using KinoDev.ApiGateway.Infrastructure.Models.ConfigurationSettings;
+    using KinoDev.ApiGateway.Infrastructure.Services.Abstractions;
     using KinoDev.Shared.DtoModels.Orders;
     using KinoDev.Shared.Services.Abstractions;
     using MediatR;
@@ -25,18 +26,22 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 
         private readonly MessageBrokerSettings _messageBrokerSettings;
 
+        private readonly IUpService _upService;
+
         public CompleteOrderCommandHandler(
             IDomainServiceClient domainServiceClient,
             IPaymentClient paymentClient,
             ILogger<CompleteOrderCommandHandler> logger,
             IMessageBrokerService messageBrokerService,
-            IOptions<MessageBrokerSettings> messageBrokerOptions)
+            IOptions<MessageBrokerSettings> messageBrokerOptions,
+            IUpService upService)
         {
             _domainServiceClient = domainServiceClient;
             _paymentClient = paymentClient;
             _logger = logger;
             _messageBrokerService = messageBrokerService;
             _messageBrokerSettings = messageBrokerOptions.Value;
+            _upService = upService;
         }
 
         public async Task<OrderDto?> Handle(CompleteOrderCommand request, CancellationToken cancellationToken)
@@ -84,6 +89,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 
                 try
                 {
+                    await _upService.Up();
                     await _messageBrokerService.SendMessageAsync(
                         _messageBrokerSettings.Queues.OrderCompleted,
                         orderSummary
