@@ -22,7 +22,7 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         public async Task Up()
         {
-            await _httpClient.GetAsync("up");
+            await _httpClient.GetAsync("api/up");
         }
 
         public async Task<string> UploadFileAsync(string fileName, byte[] bytes)

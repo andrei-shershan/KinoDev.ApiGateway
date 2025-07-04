@@ -233,7 +233,7 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
         public async Task Up()
         {
-            var response = await _httpClient.GetAsync("up");
+            var response = await _httpClient.GetAsync("api/up");
             _logger.LogInformation($"Response from up endpoint: {response.StatusCode}");
         }
     }
