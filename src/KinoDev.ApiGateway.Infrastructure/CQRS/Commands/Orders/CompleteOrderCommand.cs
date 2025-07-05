@@ -87,6 +87,10 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
             {
                 var orderSummary = await _domainServiceClient.GetOrderSummaryAsync(completedOrder.Id);
 
+                // TODO: Handle empty Url properly
+                // Should be setup as empty to handle properly in functions
+                orderSummary.FileUrl = string.Empty;
+
                 try
                 {
                     await _upService.Up();
