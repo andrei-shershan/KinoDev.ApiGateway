@@ -53,7 +53,7 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Emails
 
                 if (!response)
                 {   
-                    return false; // Email sending failed
+                    return false;
                 }
 
                 _memoryCache.Set(cacheKey, verificationCode, TimeSpan.FromMinutes(10));
@@ -65,7 +65,6 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Emails
 
         private string GenerateVerificationCode()
         {
-            // Generate a random 6-digit verification code
             var random = new Random();
             return random.Next(100000, 999999).ToString();
         }

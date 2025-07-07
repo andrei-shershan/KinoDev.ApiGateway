@@ -21,10 +21,5 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
 
             return response.IsSuccessStatusCode;
         }
-
-        public async Task Up()
-        {
-            await _httpClient.GetAsync("api/up");
-        }
     }
 }

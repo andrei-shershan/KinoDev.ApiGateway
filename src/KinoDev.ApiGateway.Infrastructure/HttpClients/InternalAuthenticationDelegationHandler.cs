@@ -40,10 +40,8 @@ namespace KinoDev.ApiGateway.Infrastructure.HttpClients
                     );
             }
 
-            // Add the token to the request headers
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token.AccessToken);
 
-            // Call the inner handler to continue processing
             return await base.SendAsync(request, cancellationToken);
         }
 

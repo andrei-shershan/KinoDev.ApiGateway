@@ -93,7 +93,6 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 
                 try
                 {
-                    await _upService.Up();
                     await _messageBrokerService.SendMessageAsync(
                         _messageBrokerSettings.Queues.OrderCompleted,
                         orderSummary
