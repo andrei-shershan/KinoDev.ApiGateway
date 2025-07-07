@@ -53,7 +53,5 @@ public interface IDomainServiceClient
     Task<bool> Test();
 
     Task<bool> Test2();
-
-    Task Up();
 }
 
