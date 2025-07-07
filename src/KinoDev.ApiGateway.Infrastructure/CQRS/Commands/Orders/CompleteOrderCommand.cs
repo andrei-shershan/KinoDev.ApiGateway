@@ -26,22 +26,19 @@ namespace KinoDev.ApiGateway.Infrastructure.CQRS.Commands.Orders
 
         private readonly MessageBrokerSettings _messageBrokerSettings;
 
-        private readonly IUpService _upService;
-
         public CompleteOrderCommandHandler(
             IDomainServiceClient domainServiceClient,
             IPaymentClient paymentClient,
             ILogger<CompleteOrderCommandHandler> logger,
             IMessageBrokerService messageBrokerService,
-            IOptions<MessageBrokerSettings> messageBrokerOptions,
-            IUpService upService)
+            IOptions<MessageBrokerSettings> messageBrokerOptions
+            )
         {
             _domainServiceClient = domainServiceClient;
             _paymentClient = paymentClient;
             _logger = logger;
             _messageBrokerService = messageBrokerService;
             _messageBrokerSettings = messageBrokerOptions.Value;
-            _upService = upService;
         }
 
         public async Task<OrderDto?> Handle(CompleteOrderCommand request, CancellationToken cancellationToken)

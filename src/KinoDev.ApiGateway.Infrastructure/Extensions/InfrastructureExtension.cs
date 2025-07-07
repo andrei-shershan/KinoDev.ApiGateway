@@ -40,8 +40,6 @@ namespace KinoDev.ApiGateway.Infrastructure.Extensions
 
             services.AddScoped<ICacheKeyService, CacheKeyService>();
             
-            services.AddScoped<IUpService, UpService>();
-
             return services;
         }
     }
