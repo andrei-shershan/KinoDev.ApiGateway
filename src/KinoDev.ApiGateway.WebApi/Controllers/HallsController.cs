@@ -10,7 +10,6 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    // TODO: Provide read-only access for managers
     [Authorize]
     public class HallsController : ControllerBase
     {

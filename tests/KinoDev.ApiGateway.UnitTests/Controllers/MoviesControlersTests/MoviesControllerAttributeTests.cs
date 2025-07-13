@@ -25,7 +25,7 @@ namespace KinoDev.ApiGateway.UnitTests.Controllers.MoviesControlersTests
             
             var authorizeAttribute = controllerType.GetCustomAttribute<AuthorizeAttribute>();
             Assert.NotNull(authorizeAttribute);
-            Assert.Equal($"{Roles.Admin}", authorizeAttribute.Roles);
+            Assert.Equal($"{Roles.Admin},{Roles.Manager}", authorizeAttribute.Roles);
         }
         
         [Fact]
