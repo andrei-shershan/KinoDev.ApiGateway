@@ -24,8 +24,8 @@ namespace KinoDev.ApiGateway.UnitTests.Controllers.MoviesControlersTests
             Assert.NotNull(apiControllerAttribute);
             
             var authorizeAttribute = controllerType.GetCustomAttribute<AuthorizeAttribute>();
-            Assert.NotNull(authorizeAttribute);
-            Assert.Equal($"{Roles.Admin},{Roles.Manager}", authorizeAttribute.Roles);
+            Assert.Equal("Authorize", authorizeAttribute.ToString());
+            //Assert.Equal($"{Roles.Admin},{Roles.Manager}", authorizeAttribute.Roles);
         }
         
         [Fact]
@@ -60,6 +60,10 @@ namespace KinoDev.ApiGateway.UnitTests.Controllers.MoviesControlersTests
             var httpGetAttribute = methodInfo.GetCustomAttribute<HttpGetAttribute>();
             Assert.NotNull(httpGetAttribute);
             Assert.Null(httpGetAttribute.Template);
+            
+            var authorizeAttribute = methodInfo.GetCustomAttribute<AuthorizeAttribute>();
+            Assert.NotNull(authorizeAttribute);
+            Assert.Equal($"{Roles.Admin},{Roles.Manager}", authorizeAttribute.Roles);
         }
         
         [Fact]
@@ -73,6 +77,10 @@ namespace KinoDev.ApiGateway.UnitTests.Controllers.MoviesControlersTests
             var httpGetAttribute = methodInfo.GetCustomAttribute<HttpGetAttribute>();
             Assert.NotNull(httpGetAttribute);
             Assert.Equal("{id}", httpGetAttribute.Template);
+            
+            var authorizeAttribute = methodInfo.GetCustomAttribute<AuthorizeAttribute>();
+            Assert.NotNull(authorizeAttribute);
+            Assert.Equal($"{Roles.Admin},{Roles.Manager}", authorizeAttribute.Roles);
         }
         
         [Fact]
@@ -86,6 +94,10 @@ namespace KinoDev.ApiGateway.UnitTests.Controllers.MoviesControlersTests
             var httpPostAttribute = methodInfo.GetCustomAttribute<HttpPostAttribute>();
             Assert.NotNull(httpPostAttribute);
             Assert.Null(httpPostAttribute.Template);
+            
+            var authorizeAttribute = methodInfo.GetCustomAttribute<AuthorizeAttribute>();
+            Assert.NotNull(authorizeAttribute);
+            Assert.Equal($"{Roles.Admin}", authorizeAttribute.Roles);
         }
     }
 }
