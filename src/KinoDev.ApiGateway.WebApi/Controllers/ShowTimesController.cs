@@ -1,5 +1,6 @@
 using KinoDev.ApiGateway.Infrastructure.CQRS.Commands.ShowTimes;
 using KinoDev.ApiGateway.Infrastructure.CQRS.Queries.ShowTimes;
+using KinoDev.Shared.Constants;
 using KinoDev.Shared.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -11,8 +12,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
     {
         [Route("api/[controller]")]
         [ApiController]
-        // TODO: Review authorization
-        [AllowAnonymous]
+        [Authorize]
         public class ShowTimesController : ControllerBase
         {
             private readonly IMediator _mediator;
@@ -23,6 +23,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             }
 
             [HttpGet("details/{id}")]
+            [AllowAnonymous]
             public async Task<IActionResult> GetMoviesAsync([FromRoute] int id)
             {
                 var response = await _mediator.Send(new GetShowTimeDetailsQuery()
@@ -39,6 +40,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             }
 
             [HttpGet("{startDate:datetime}/{endDate:datetime}")]
+            [AllowAnonymous]
             public async Task<IActionResult> GetShowTimesByDateAsync([FromRoute] DateTime startDate, [FromRoute] DateTime endDate)
             {
                 if (startDate > endDate)
@@ -61,6 +63,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             }
 
             [HttpGet("seats/{id}")]
+            [AllowAnonymous]
             public async Task<IActionResult> GetSeatsAsync([FromRoute] int id)
             {
                 var response = await _mediator.Send(new GetShowTimeSeatsQuery()
@@ -76,9 +79,8 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                 return NotFound();
             }
 
-            // TODO: Add role 
-            [Authorize]
             [HttpGet("slots/{date:datetime}")]
+            [Authorize(Roles = $"{Roles.Admin},{Roles.Manager}")]
             public async Task<IActionResult> GetShowTimesForDateAsync([FromRoute] DateTime date)
             {
                 var response = await _mediator.Send(new GetShowTimesForDateQuery()
@@ -94,9 +96,8 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
                 return Ok(response);
             }
 
-            // TODO: Add role
-            [Authorize]
             [HttpPost]
+            [Authorize(Roles = $"{Roles.Admin}")]
             public async Task<IActionResult> CreateShowTimeAsync([FromBody] CreateShowTimeCommand command)
             {
                 if (command == null)

@@ -11,8 +11,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // TODO: Provide read-only access for managers
-    [Authorize(Roles = $"{Roles.Admin}")]
+    [Authorize]
     public class MoviesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -26,6 +25,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Manager}")]
         public async Task<IActionResult> GetMoviesAsync()
         {
             var response = await _mediator.Send(new GetMoviesQuery());
@@ -38,6 +38,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Manager}")]
         public async Task<IActionResult> GetMovieByIdAsync([FromRoute] int id)
         {
             var response = await _mediator.Send(new GetMovieByIdQuery()
@@ -54,6 +55,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = $"{Roles.Admin}")]
         public async Task<IActionResult> CreateMovieAsync()
         {
             var response = await _mediator.Send(new CreateMovieCommand()
@@ -85,38 +87,6 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
             }
 
             return Ok(response);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("test")]
-        public IActionResult Test()
-        {
-            _logger.LogInformation("Test endpoint hit at {Time}", DateTime.UtcNow);
-            return Ok($"Test successful, {DateTime.UtcNow} UTC");
-        }
-
-        [AllowAnonymous]
-        [HttpGet("test-domain")]
-        public async Task<IActionResult> TestDomain()
-        {
-            var response = await _mediator.Send(new GetTestQuery());
-            if (!response)
-            {
-                return BadRequest("Test failed.");
-            }
-            return Ok($"Test successful, {DateTime.UtcNow} UTC");
-        }
-
-        [AllowAnonymous]
-        [HttpGet("test-domain-2")]
-        public async Task<IActionResult> TestDomain2()
-        {
-            var response = await _mediator.Send(new GetTest2Query());
-            if (!response)
-            {
-                return BadRequest("Test failed.");
-            }
-            return Ok($"Test successful, {DateTime.UtcNow} UTC");
         }
     }
 }
