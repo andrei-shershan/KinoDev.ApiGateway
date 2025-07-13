@@ -10,8 +10,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    // TODO: Provide read-only access for managers
-    [Authorize(Roles = $"{Roles.Admin}")]
+    [Authorize]
     public class HallsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -22,6 +21,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Manager}")]
         public async Task<IActionResult> GetHallsAsync()
         {
             var halls = await _mediator.Send(new GetHallsQuery());
@@ -34,6 +34,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Manager}")]
         public async Task<IActionResult> GetHallByIdAsync([FromRoute] int id)
         {
             var hall = await _mediator.Send(new GetHallQuery { Id = id });
@@ -46,6 +47,7 @@ namespace KinoDev.ApiGateway.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = $"{Roles.Admin}")]
         public async Task<IActionResult> CreateHallAsync([FromBody] CreateHallCommand request)
         {
             if (request == null)
